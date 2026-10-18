@@ -9,80 +9,80 @@
 const CERTIFICATES = [
   {
     "img": "assets/img/certificates/AI Fundamentals - Udacity.webp",
-    "issuer": "Certification",
-    "title": "AI Fundamentals   Udacity",
+    "issuer": "Udacity",
+    "title": "AI Fundamentals",
     "featured": true
   },
   {
     "img": "assets/img/certificates/AI Powered AB testing - Sololearn.webp",
-    "issuer": "Certification",
-    "title": "AI Powered Ab Testing   Sololearn",
+    "issuer": "Sololearn",
+    "title": "AI Powered Ab Testing",
     "featured": true
   },
   {
     "img": "assets/img/certificates/Android Development - Udacity.webp",
-    "issuer": "Certification",
-    "title": "Android Development   Udacity",
+    "issuer": "Udacity",
+    "title": "Android Development",
     "featured": true
   },
   {
     "img": "assets/img/certificates/Data Analysis Fundamentals - Udacity.webp",
-    "issuer": "Certification",
-    "title": "Data Analysis Fundamentals   Udacity",
+    "issuer": "Udacity",
+    "title": "Data Analysis Fundamentals",
     "featured": true
   },
   {
     "img": "assets/img/certificates/HTML - Sololearn.webp",
-    "issuer": "Certification",
-    "title": "HTML   Sololearn",
+    "issuer": "Sololearn",
+    "title": "HTML",
     "featured": true
   },
   {
     "img": "assets/img/certificates/Intro to CSS - Sololearn.webp",
-    "issuer": "Certification",
-    "title": "Intro To CSS   Sololearn",
+    "issuer": "Sololearn",
+    "title": "Intro To CSS",
     "featured": false
   },
   {
     "img": "assets/img/certificates/Intro to JavaScript - Sololearn.webp",
-    "issuer": "Certification",
-    "title": "Intro To Java Script   Sololearn",
+    "issuer": "Sololearn",
+    "title": "Intro To Java Script",
     "featured": false
   },
   {
     "img": "assets/img/certificates/JavaScript Interrmediate - Sololearn.webp",
-    "issuer": "Certification",
-    "title": "Java Script Interrmediate   Sololearn",
+    "issuer": "Sololearn",
+    "title": "Java Script Intermediate",
     "featured": false
   },
   {
     "img": "assets/img/certificates/MERN Stack Development - Evangadi.webp",
-    "issuer": "Certification",
-    "title": "Mern Stack Development   Evangadi",
+    "issuer": "Evangadi",
+    "title": "Mern Stack Development",
     "featured": false
   },
   {
     "img": "assets/img/certificates/Programming Fundamentals - Udacity.webp",
-    "issuer": "Certification",
-    "title": "Programming Fundamentals   Udacity",
+    "issuer": "Udacity",
+    "title": "Programming Fundamentals",
     "featured": false
   },
   {
     "img": "assets/img/certificates/Prompt Engineering - Sololearn.webp",
-    "issuer": "Certification",
-    "title": "Prompt Engineering   Sololearn",
+    "issuer": "Sololearn",
+    "title": "Prompt Engineering",
     "featured": false
   },
   {
     "img": "assets/img/certificates/Python For Begginers - Sololearn.webp",
-    "issuer": "Certification",
-    "title": "Python For Begginers   Sololearn",
+    "issuer": "Sololearn",
+    "title": "Python For Begginers",
     "featured": false
   },
   {
     "img": "assets/img/certificates/Responsive web design - FreeCodeCamp.webp",
-    "issuer": "Certification",
-    "title": "Responsive Web Design   Free Code Camp",
+    "issuer": "FreeCodeCamp",
+    "title": "Responsive Web Design",
     "featured": false
   }
 ];
