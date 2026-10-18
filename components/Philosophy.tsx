@@ -1,4 +1,10 @@
-export default function Philosophy() {
+import type { PhilosophyData } from "@/lib/portfolio";
+
+interface PhilosophyProps {
+  philosophy: PhilosophyData;
+}
+
+export default function Philosophy({ philosophy }: PhilosophyProps) {
   return (
     <section
       id="philosophy"
@@ -19,7 +25,7 @@ export default function Philosophy() {
 
         <div className="flex items-center gap-2 mb-2">
           <span className="font-mono text-xs uppercase tracking-widest text-[#5eead4] font-medium">
-            ENGINEERING PRINCIPLE / 01
+            {philosophy.principle_tag}
           </span>
         </div>
 
@@ -27,36 +33,19 @@ export default function Philosophy() {
           <span className="material-symbols-outlined text-[#5eead4] text-[22px]">
             psychology
           </span>
-          <span>Beyond the Code</span>
+          <span>{philosophy.title}</span>
         </h3>
 
         <div className="text-sm md:text-base text-[#bbcac5] leading-relaxed space-y-4">
-          <p>
-            AI is changing how software is built, but writing code has never been
-            the whole job of an engineer. Building reliable software requires
-            understanding ambiguous problems, making{" "}
-            <span className="text-[#5eead4] font-medium">architectural trade-offs</span>,
-            reasoning about security and performance, validating results, and taking
-            responsibility for systems in production.
-          </p>
-
-          <p>
-            AI can accelerate implementation, but its output still needs direction,
-            verification, and sound{" "}
-            <span className="text-[#5eead4] font-medium">engineering judgment</span>.
-            The future belongs not to developers who compete with AI at generating code,
-            but to engineers who use it effectively while mastering the fundamentals that{" "}
-            <span className="text-[#5eead4] font-medium">make software dependable</span>.
-          </p>
+          <p>{philosophy.paragraph1}</p>
+          <p>{philosophy.paragraph2}</p>
         </div>
       </div>
 
-      {/* Editorial Colophon */}
+      {/* Editorial Colophon from DB */}
       <footer className="mt-16 pt-8 border-t border-[#2d3449]/30 text-xs font-mono text-[#94a3b8] flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p>
-          Crafted with Next.js, TypeScript &amp; Tailwind CSS. Hosted on Vercel.
-        </p>
-        <p>© 2026 Natan Yidnekachew. All rights reserved.</p>
+        <p>{philosophy.footer_text}</p>
+        <p>{philosophy.copyright}</p>
       </footer>
     </section>
   );

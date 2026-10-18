@@ -1,47 +1,11 @@
-interface ExperienceItem {
-  period: string;
-  role: string;
-  company: string;
-  companyUrl?: string;
-  tagline: string;
-  description: string;
-  skills: string[];
+import type { ExperienceData } from "@/lib/portfolio";
+
+interface ExperienceProps {
+  experiences: ExperienceData[];
+  resumeUrl: string;
 }
 
-const experiences: ExperienceItem[] = [
-  {
-    period: "2024 — PRESENT",
-    role: "Founding Backend Engineer",
-    company: "ApexStream",
-    companyUrl: "https://github.com/cipherWizard31",
-    tagline: "Distributed Event Streaming Engine",
-    description:
-      "Spearheaded the core asynchronous messaging engine handling 450k+ events/sec with sub-millisecond p99 latency across distributed clusters. Implemented custom zero-copy binary serialization in Go and integrated Raft consensus for fault-tolerant state machine replication, ensuring zero data loss during simulated cluster splits.",
-    skills: ["Go", "Raft", "gRPC", "Redis", "eBPF", "Kubernetes", "Prometheus"],
-  },
-  {
-    period: "2023 — 2024",
-    role: "Backend & Systems Contributor",
-    company: "OpenCompute & HyperKV",
-    companyUrl: "https://github.com/cipherWizard31",
-    tagline: "High Performance Storage Systems",
-    description:
-      "Designed an LSM-tree storage engine in Rust featuring an append-only write-ahead log (WAL) and concurrent tiered memtable compaction algorithms. Authored a high-precision benchmark suite using Criterion.rs demonstrating a 3.2x write throughput improvement over conventional B-tree implementations under extreme load.",
-    skills: ["Rust", "LSM-Tree", "RocksDB", "Linux Internals", "Criterion.rs"],
-  },
-  {
-    period: "2022 — 2023",
-    role: "Junior Infrastructure Intern",
-    company: "CloudForge Labs",
-    companyUrl: "https://github.com/cipherWizard31",
-    tagline: "Cloud Reliability & Automation",
-    description:
-      "Automated CI/CD telemetry pipelines across staging environments, safely migrated production PostgreSQL schemas with zero downtime using pg_repack, and engineered distributed rate limiting microservices leveraging the token bucket algorithm in Redis cluster shards.",
-    skills: ["Python", "PostgreSQL", "Redis", "Docker", "Terraform", "GitHub Actions"],
-  },
-];
-
-export default function Experience() {
+export default function Experience({ experiences, resumeUrl }: ExperienceProps) {
   return (
     <section
       id="experience"
@@ -57,9 +21,9 @@ export default function Experience() {
       </div>
 
       <div className="mt-4 lg:mt-0 flex flex-col gap-6">
-        {experiences.map((exp, index) => (
+        {experiences.map((exp) => (
           <div
-            key={index}
+            key={exp.id}
             className="group relative rounded-xl p-6 bg-[#171f33]/30 hover:bg-[#171f33]/80 border border-[#2d3449]/40 hover:border-[#5eead4]/30 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-0.5"
           >
             <div className="flex flex-col sm:flex-row sm:gap-6">
@@ -89,7 +53,7 @@ export default function Experience() {
                   {exp.description}
                 </p>
 
-                {/* Tech Pills */}
+                {/* Tech Pills from SQLite DB */}
                 <ul
                   aria-label="Technologies used"
                   className="mt-4 flex flex-wrap gap-1.5"
@@ -112,7 +76,7 @@ export default function Experience() {
       {/* Résumé / CV Link */}
       <div className="mt-8">
         <a
-          href="/resume.pdf"
+          href={resumeUrl}
           target="_blank"
           rel="noreferrer noopener"
           className="inline-flex items-center gap-2 font-mono text-sm text-[#e2e8f0] hover:text-[#5eead4] transition-colors duration-200 group"

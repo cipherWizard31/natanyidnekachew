@@ -1,80 +1,14 @@
-interface SkillCategory {
-  title: string;
-  skills: string[];
+import type { SkillCategoryData, ArticleData } from "@/lib/portfolio";
+
+interface SkillsWritingProps {
+  skillCategories: SkillCategoryData[];
+  articles: ArticleData[];
 }
 
-const skillCategories: SkillCategory[] = [
-  {
-    title: "Core Languages",
-    skills: ["Go", "Rust", "Python", "C", "SQL", "Bash"],
-  },
-  {
-    title: "Storage & Data Systems",
-    skills: [
-      "PostgreSQL",
-      "Redis",
-      "Apache Kafka",
-      "ScyllaDB / Cassandra",
-      "MongoDB",
-      "ClickHouse",
-    ],
-  },
-  {
-    title: "Cloud & Low-Level Infra",
-    skills: [
-      "Docker",
-      "Kubernetes",
-      "Linux (eBPF, systemd)",
-      "Terraform",
-      "AWS",
-      "CI/CD Telemetry",
-    ],
-  },
-  {
-    title: "System Architecture",
-    skills: [
-      "Distributed Systems",
-      "Concurrency Patterns",
-      "Microservices",
-      "Event-Driven",
-      "gRPC / Protobuf",
-    ],
-  },
-];
-
-interface Article {
-  year: string;
-  title: string;
-  publication: string;
-  url: string;
-  readTime: string;
-}
-
-const articles: Article[] = [
-  {
-    year: "2024",
-    title: "Demystifying Raft Consensus: Building a Replicated State Machine in Rust",
-    publication: "Systems Engineering Digest",
-    url: "https://cipherwizard.substack.com",
-    readTime: "8 min read",
-  },
-  {
-    year: "2024",
-    title: "Zero-Copy Socket Buffers and Kernel-Bypass Networking with eBPF",
-    publication: "Substack / Distributed Musings",
-    url: "https://cipherwizard.substack.com",
-    readTime: "6 min read",
-  },
-  {
-    year: "2023",
-    title: "Why Mechanical Sympathy Still Dictates P99 Latency at Scale",
-    publication: "Backend Weekly",
-    url: "https://cipherwizard.substack.com",
-    readTime: "11 min read",
-  },
-];
-
-export default function SkillsWriting() {
+export default function SkillsWriting({
+  skillCategories,
+  articles,
+}: SkillsWritingProps) {
   return (
     <section
       id="writing"
@@ -90,7 +24,7 @@ export default function SkillsWriting() {
       </div>
 
       <div className="mt-4 lg:mt-0 space-y-6">
-        {/* Technical Arsenal Card */}
+        {/* Technical Arsenal Card from SQLite DB */}
         <div className="p-6 rounded-xl bg-[#171f33]/30 border border-[#2d3449]/40 shadow-sm space-y-6">
           <h3 className="text-lg font-semibold text-[#e2e8f0] flex items-center gap-2">
             <span className="material-symbols-outlined text-[#5eead4] text-[20px]">
@@ -101,7 +35,7 @@ export default function SkillsWriting() {
 
           <div className="space-y-4">
             {skillCategories.map((category) => (
-              <div key={category.title}>
+              <div key={category.id}>
                 <span className="font-mono text-[11px] uppercase tracking-widest text-[#94a3b8] block mb-2">
                   {category.title}
                 </span>
@@ -127,7 +61,7 @@ export default function SkillsWriting() {
           </div>
         </div>
 
-        {/* Selected Technical Writing */}
+        {/* Selected Technical Writing from SQLite DB */}
         <div className="p-6 rounded-xl bg-[#171f33]/30 border border-[#2d3449]/40 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-[#e2e8f0] flex items-center gap-2">
@@ -143,9 +77,9 @@ export default function SkillsWriting() {
           </div>
 
           <div className="space-y-3">
-            {articles.map((art, idx) => (
+            {articles.map((art) => (
               <a
-                key={idx}
+                key={art.id}
                 href={art.url}
                 target="_blank"
                 rel="noreferrer noopener"
@@ -162,7 +96,7 @@ export default function SkillsWriting() {
                     <p className="font-mono text-xs text-[#94a3b8] mt-1 flex items-center gap-2">
                       <span>{art.publication}</span>
                       <span className="w-1 h-1 rounded-full bg-[#94a3b8]/50"></span>
-                      <span>{art.readTime}</span>
+                      <span>{art.read_time}</span>
                     </p>
                   </div>
                   <span className="font-mono text-xs text-[#94a3b8] shrink-0">

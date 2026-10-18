@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import type { ProfileData, SocialLinkData } from "@/lib/portfolio";
 
 interface NavItem {
   id: string;
@@ -17,40 +18,12 @@ const navItems: NavItem[] = [
   { id: "philosophy", label: "Philosophy" },
 ];
 
-const socialLinks = [
-  {
-    name: "GitHub",
-    icon: "code",
-    href: "https://github.com/cipherWizard31",
-    label: "GitHub Profile",
-  },
-  {
-    name: "LinkedIn",
-    icon: "share",
-    href: "https://linkedin.com/in/natanyidnekachew",
-    label: "LinkedIn Profile",
-  },
-  {
-    name: "Telegram",
-    icon: "terminal",
-    href: "https://t.me/CipherWizard",
-    label: "Telegram / Channel",
-  },
-  {
-    name: "Email",
-    icon: "mail",
-    href: "mailto:natanyidnkeachew@gmail.com",
-    label: "Email Inquiries",
-  },
-  {
-    name: "Substack",
-    icon: "article",
-    href: "https://cipherwizard.substack.com",
-    label: "Engineering Substack",
-  },
-];
+interface SidebarProps {
+  profile: ProfileData;
+  socialLinks: SocialLinkData[];
+}
 
-export default function Sidebar() {
+export default function Sidebar({ profile, socialLinks }: SidebarProps) {
   const [activeSection, setActiveSection] = useState<string>("about");
 
   useEffect(() => {
@@ -100,7 +73,6 @@ export default function Sidebar() {
         block: "start",
       });
       setActiveSection(targetId);
-      // update hash without abrupt jump
       window.history.pushState(null, "", `#${targetId}`);
     }
   };
@@ -108,22 +80,21 @@ export default function Sidebar() {
   return (
     <header className="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/2 lg:flex-col lg:justify-between lg:py-16 pt-10 pb-8">
       <div className="flex flex-col">
-        {/* Name and Tagline */}
+        {/* Name and Tagline from SQLite DB */}
         <div>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#dae2fd]">
             <a
               href="#"
               className="hover:text-[#b5fff0] transition-colors duration-200"
             >
-              Natan Yidnekachew
+              {profile.name}
             </a>
           </h1>
           <h2 className="mt-3 text-lg sm:text-xl font-medium tracking-tight text-[#b5fff0]">
-            Backend Engineer &amp; Distributed Systems Enthusiast
+            {profile.title}
           </h2>
           <p className="mt-4 max-w-xs text-sm leading-normal text-[#94a3b8]">
-            I build robust, scalable server architectures, distributed databases,
-            high-throughput microservices, and high-performance backend systems.
+            {profile.summary}
           </p>
         </div>
 
@@ -161,11 +132,11 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Social links & Profile Avatar */}
+      {/* Social links & Profile Avatar from DB */}
       <div className="mt-10 lg:mt-0 flex items-center justify-between">
         <ul aria-label="Social and contact links" className="flex items-center gap-5">
           {socialLinks.map((social) => (
-            <li key={social.name}>
+            <li key={social.id}>
               <a
                 href={social.href}
                 aria-label={social.label}
@@ -181,16 +152,15 @@ export default function Sidebar() {
           ))}
         </ul>
 
-        {/* Profile Avatar / Indicator */}
+        {/* Profile Avatar using DB image URL */}
         <div className="relative w-9 h-9 rounded-full overflow-hidden border border-[#5eead4]/40 bg-[#171f33] shadow-inner flex items-center justify-center">
           <Image
-            src="/profile.webp"
-            alt="Natan Yidnekachew"
+            src={profile.avatar_url}
+            alt={profile.name}
             width={36}
             height={36}
             className="w-full h-full object-cover"
             onError={(e) => {
-              // fallback if image fails to load
               (e.currentTarget as HTMLElement).style.display = "none";
             }}
           />

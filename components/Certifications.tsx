@@ -1,128 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import type { CertificationData } from "@/lib/portfolio";
 
-interface CredentialItem {
-  id: string;
-  title: string;
-  issuer: string;
-  icon: string;
-  code: string;
-  year: string;
-  date: string;
-  validity: string;
-  track: string;
-  category: string;
-  status: string;
-  verifyUrl: string;
-  description: string;
-  skills: string[];
+interface CertificationsProps {
+  certifications: CertificationData[];
 }
 
-const credentialsData: CredentialItem[] = [
-  {
-    id: "aws-csa",
-    title: "AWS Certified Solutions Architect – Associate",
-    issuer: "Amazon Web Services",
-    icon: "cloud_done",
-    code: "AWS-PSA-9938210",
-    year: "2024",
-    date: "Oct 2024",
-    validity: "Valid thru Oct 2027",
-    track: "Cloud Architecture",
-    category: "Cloud",
-    status: "Active & Verified",
-    verifyUrl: "https://cp.certmetrics.com/amazon/en/public/verify/credential",
-    description:
-      "Demonstrates comprehensive technical proficiency in designing secure, resilient, high-performing, and cost-optimized distributed systems architectures across Amazon Web Services infrastructure.",
-    skills: [
-      "AWS IAM & VPC",
-      "Fault Tolerant Design",
-      "Multi-AZ Deployments",
-      "S3 & DynamoDB",
-      "Auto Scaling Groups",
-      "CloudFormation / IaC",
-      "Cost Optimization",
-    ],
-  },
-  {
-    id: "cncf-ckad",
-    title: "Certified Kubernetes Application Developer (CKAD)",
-    issuer: "Cloud Native Computing Foundation (CNCF)",
-    icon: "deployed_code",
-    code: "CKA-2400-88192",
-    year: "2024",
-    date: "Feb 2024",
-    validity: "Valid thru Feb 2027",
-    track: "Systems Engineering",
-    category: "Systems Engineering",
-    status: "Active & Verified",
-    verifyUrl: "https://www.cncf.io/certification/ckad/",
-    description:
-      "Verifies performance-based skills in designing, building, configuring, and exposing cloud-native containerized applications for production Kubernetes clusters and container runtimes.",
-    skills: [
-      "Pod Design & Lifecycle",
-      "Service Networking & Ingress",
-      "StatefulSets & PersistentVolumes",
-      "Helm Charts",
-      "ConfigMaps & Secrets",
-      "Application Observability",
-      "Multi-Container Pods",
-    ],
-  },
-  {
-    id: "uiuc-ds",
-    title: "Distributed Systems & Cloud Computing Specialization",
-    issuer: "Coursera / University of Illinois Urbana-Champaign",
-    icon: "hub",
-    code: "COURSERA-DS-77491",
-    year: "2023",
-    date: "Nov 2023",
-    validity: "Lifetime Credential",
-    track: "Backend Development",
-    category: "Backend Development",
-    status: "Conferred & Verified",
-    verifyUrl: "https://www.coursera.org/verify/specialization",
-    description:
-      "Rigorous 5-course university specialization covering consensus protocols (Paxos, Raft), peer-to-peer topologies, distributed key-value storage, concurrency controls, and failure detection models.",
-    skills: [
-      "Consensus Protocols (Raft, Paxos)",
-      "CAP Theorem & Quorums",
-      "MapReduce & Spark",
-      "Gossip Protocols",
-      "Vector Clocks",
-      "Distributed Hashing",
-      "Byzantine Fault Tolerance",
-    ],
-  },
-  {
-    id: "tcm-pnpt",
-    title: "Practical Network Penetration Tester (PNPT)",
-    issuer: "TCM Security Academy",
-    icon: "security",
-    code: "PNPT-2023-4482",
-    year: "2023",
-    date: "Aug 2023",
-    validity: "Lifetime Credential",
-    track: "Cybersecurity",
-    category: "Cybersecurity",
-    status: "Active & Verified",
-    verifyUrl: "https://certifications.tcm-sec.com/pnpt/",
-    description:
-      "Hands-on 5-day practical examination executing end-to-end network penetration tests, Active Directory exploitation, privilege escalation, lateral movement, and remediation reporting.",
-    skills: [
-      "Active Directory Attacks",
-      "Network Pivoting & Tunneling",
-      "Privilege Escalation",
-      "OSINT & Reconnaissance",
-      "Buffer Overflow Basics",
-      "Mitigation & Hardening",
-    ],
-  },
-];
-
-export default function Certifications() {
-  const [selectedCert, setSelectedCert] = useState<CredentialItem | null>(null);
+export default function Certifications({ certifications }: CertificationsProps) {
+  const [selectedCert, setSelectedCert] = useState<CertificationData | null>(null);
 
   return (
     <section
@@ -149,13 +35,13 @@ export default function Certifications() {
           </h3>
           <span className="font-mono text-xs text-[#94a3b8] flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#5eead4]"></span>
-            {credentialsData.length} Verified Credentials
+            {certifications.length} Verified Credentials
           </span>
         </div>
 
-        {/* Credentials Grid */}
+        {/* Credentials Grid from SQLite DB */}
         <div className="grid grid-cols-1 gap-3">
-          {credentialsData.map((cred) => (
+          {certifications.map((cred) => (
             <button
               key={cred.id}
               onClick={() => setSelectedCert(cred)}
@@ -231,11 +117,11 @@ export default function Certifications() {
           aria-modal="true"
           aria-labelledby="modal-cert-title"
           onClick={() => setSelectedCert(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-[#060e20]/85 backdrop-blur-md transition-opacity duration-300 animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-[#060e20]/85 backdrop-blur-md transition-opacity duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-2xl bg-[#171f33] rounded-2xl border border-[#5eead4]/30 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-scaleUp"
+            className="relative w-full max-w-2xl bg-[#171f33] rounded-2xl border border-[#5eead4]/30 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
           >
             {/* Modal Ambient Glow Top */}
             <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[#5eead4]/15 via-transparent to-transparent pointer-events-none" />
@@ -374,7 +260,7 @@ export default function Certifications() {
                   Close (Esc)
                 </button>
                 <a
-                  href={selectedCert.verifyUrl}
+                  href={selectedCert.verify_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-4 py-2 rounded-lg font-mono text-xs font-semibold bg-[#5eead4] text-[#00675b] hover:bg-[#b5fff0] transition-all duration-200 inline-flex items-center gap-1.5 shadow-lg shadow-[#5eead4]/20 hover:shadow-[#5eead4]/40"
