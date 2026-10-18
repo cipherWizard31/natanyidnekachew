@@ -1,5 +1,10 @@
 import Sidebar from "@/components/Sidebar";
 import About from "@/components/About";
+import Projects from "@/components/Projects";
+import Experience from "@/components/Experience";
+import Certifications from "@/components/Certifications";
+import SkillsWriting from "@/components/SkillsWriting";
+import Philosophy from "@/components/Philosophy";
 
 export default function Home() {
   return (
@@ -23,45 +28,20 @@ export default function Home() {
             {/* About Section */}
             <About />
 
-            <section
-              id="experience"
-              className="mb-16 scroll-mt-16 lg:scroll-mt-24 p-6 rounded-xl bg-[#171f33]/40 border border-[#2d3449]/50"
-            >
-              <h2 className="text-xl font-bold text-[#dae2fd] mb-3">Experience</h2>
-              <p className="text-sm text-[#94a3b8] leading-relaxed">Experience section slot.</p>
-            </section>
+            {/* Projects Section */}
+            <Projects />
 
-            <section
-              id="projects"
-              className="mb-16 scroll-mt-16 lg:scroll-mt-24 p-6 rounded-xl bg-[#171f33]/40 border border-[#2d3449]/50"
-            >
-              <h2 className="text-xl font-bold text-[#dae2fd] mb-3">Projects</h2>
-              <p className="text-sm text-[#94a3b8] leading-relaxed">Projects section slot.</p>
-            </section>
+            {/* Experience Section */}
+            <Experience />
 
-            <section
-              id="writing"
-              className="mb-16 scroll-mt-16 lg:scroll-mt-24 p-6 rounded-xl bg-[#171f33]/40 border border-[#2d3449]/50"
-            >
-              <h2 className="text-xl font-bold text-[#dae2fd] mb-3">Skills &amp; Writing</h2>
-              <p className="text-sm text-[#94a3b8] leading-relaxed">Skills &amp; Writing section slot.</p>
-            </section>
+            {/* Certifications Section */}
+            <Certifications />
 
-            <section
-              id="certifications"
-              className="mb-16 scroll-mt-16 lg:scroll-mt-24 p-6 rounded-xl bg-[#171f33]/40 border border-[#2d3449]/50"
-            >
-              <h2 className="text-xl font-bold text-[#dae2fd] mb-3">Certifications</h2>
-              <p className="text-sm text-[#94a3b8] leading-relaxed">Certifications section slot.</p>
-            </section>
+            {/* Skills & Writing Section */}
+            <SkillsWriting />
 
-            <section
-              id="philosophy"
-              className="mb-16 scroll-mt-16 lg:scroll-mt-24 p-6 rounded-xl bg-[#171f33]/40 border border-[#2d3449]/50"
-            >
-              <h2 className="text-xl font-bold text-[#dae2fd] mb-3">Philosophy</h2>
-              <p className="text-sm text-[#94a3b8] leading-relaxed">Philosophy section slot.</p>
-            </section>
+            {/* Philosophy Section */}
+            <Philosophy />
           </main>
         </div>
       </div>

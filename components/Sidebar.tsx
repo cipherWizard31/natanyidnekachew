@@ -10,10 +10,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { id: "about", label: "About" },
-  { id: "experience", label: "Experience" },
   { id: "projects", label: "Projects" },
-  { id: "writing", label: "Skills & Writing" },
+  { id: "experience", label: "Experience" },
   { id: "certifications", label: "Certifications" },
+  { id: "writing", label: "Skills & Writing" },
   { id: "philosophy", label: "Philosophy" },
 ];
 
@@ -55,15 +55,31 @@ export default function Sidebar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 200;
+      // If user has scrolled to the bottom of the page, activate the last section
+      const isAtBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 60;
 
-      for (let i = navItems.length - 1; i >= 0; i--) {
-        const section = document.getElementById(navItems[i].id);
-        if (section && section.offsetTop <= scrollPosition) {
-          setActiveSection(navItems[i].id);
-          break;
+      if (isAtBottom) {
+        setActiveSection(navItems[navItems.length - 1].id);
+        return;
+      }
+
+      // Check section bounding rects relative to viewport
+      const threshold = window.innerHeight * 0.35;
+      let currentSection = navItems[0].id;
+
+      for (const item of navItems) {
+        const el = document.getElementById(item.id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= threshold) {
+            currentSection = item.id;
+          }
         }
       }
+
+      setActiveSection(currentSection);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
