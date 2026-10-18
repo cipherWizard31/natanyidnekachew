@@ -1,1 +1,59 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: #0b1326;
+  --color-surface: #0b1326;
+  --color-surface-dim: #0b1326;
+  --color-surface-container-lowest: #060e20;
+  --color-surface-container-low: #131b2e;
+  --color-surface-container: #171f33;
+  --color-surface-container-high: #222a3d;
+  --color-surface-container-highest: #2d3449;
+  --color-surface-variant: #2d3449;
+  --color-surface-bright: #31394d;
+
+  --color-primary: #b5fff0;
+  --color-primary-container: #5eead4;
+  --color-on-primary: #003730;
+  --color-on-primary-container: #00675b;
+
+  --color-secondary: #7bd0ff;
+  --color-secondary-container: #00a6e0;
+  --color-on-secondary: #00354a;
+
+  --color-on-surface: #dae2fd;
+  --color-on-surface-variant: #bbcac5;
+  --color-outline: #859490;
+  --color-outline-variant: #3c4946;
+
+  --color-slate-darkest: #0b1120;
+  --color-slate-surface: #1e293b;
+  --color-slate-muted: #94a3b8;
+  --color-slate-light: #e2e8f0;
+
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-sans);
+  overscroll-behavior: none;
+}
+
+/* Custom scrollbar hiding if needed */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  scrollbar-width: none;
+}
