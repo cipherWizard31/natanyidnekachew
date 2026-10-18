@@ -27,6 +27,10 @@ export async function POST(req: Request) {
       target_qps,
       consensus,
       p99_latency,
+      stat_projects = "12+",
+      stat_users = "50K+",
+      stat_uptime = "99.99%",
+      stat_experience = "4+ Yrs",
     } = body;
 
     const db = getDb();
@@ -43,7 +47,11 @@ export async function POST(req: Request) {
             runtime_version = ?,
             target_qps = ?,
             consensus = ?,
-            p99_latency = ?
+            p99_latency = ?,
+            stat_projects = ?,
+            stat_users = ?,
+            stat_uptime = ?,
+            stat_experience = ?
         WHERE id = ?
       `).run(
         paragraph1,
@@ -53,12 +61,16 @@ export async function POST(req: Request) {
         target_qps,
         consensus,
         p99_latency,
+        stat_projects,
+        stat_users,
+        stat_uptime,
+        stat_experience,
         existing.id
       );
     } else {
       db.prepare(`
-        INSERT INTO about (paragraph1, paragraph2, paragraph3, runtime_version, target_qps, consensus, p99_latency)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO about (paragraph1, paragraph2, paragraph3, runtime_version, target_qps, consensus, p99_latency, stat_projects, stat_users, stat_uptime, stat_experience)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(
         paragraph1,
         paragraph2,
@@ -66,7 +78,11 @@ export async function POST(req: Request) {
         runtime_version,
         target_qps,
         consensus,
-        p99_latency
+        p99_latency,
+        stat_projects,
+        stat_users,
+        stat_uptime,
+        stat_experience
       );
     }
 

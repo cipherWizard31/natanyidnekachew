@@ -12,6 +12,13 @@ import type {
   ArticleData,
   PhilosophyData,
 } from "@/lib/portfolio";
+import AboutModule from "./cms/modules/AboutModule";
+import ProjectsModule from "./cms/modules/ProjectsModule";
+import ExperienceModule from "./cms/modules/ExperienceModule";
+import CertificationsModule from "./cms/modules/CertificationsModule";
+import SkillsModule from "./cms/modules/SkillsModule";
+import PhilosophyModule from "./cms/modules/PhilosophyModule";
+import type { CMSTab } from "./cms/types";
 
 interface CMSClientProps {
   initialAbout: AboutData;
@@ -33,9 +40,7 @@ export default function CMSClient({
   initialPhilosophy,
 }: CMSClientProps) {
   // Navigation tab state
-  const [activeTab, setActiveTab] = useState<
-    "skills" | "philosophy" | "certifications" | "experience" | "projects" | "about"
-  >("skills");
+  const [activeTab, setActiveTab] = useState<CMSTab>("skills");
 
   // About form state
   const [aboutData, setAboutData] = useState<AboutData>(initialAbout);
@@ -702,25 +707,25 @@ export default function CMSClient({
     activeTab === "skills"
       ? (e: any) => e.preventDefault()
       : activeTab === "philosophy"
-      ? handleSavePhilosophy
-      : activeTab === "certifications"
-      ? handleSaveCert
-      : activeTab === "experience"
-      ? handleSaveExperience
-      : activeTab === "projects"
-      ? handleSaveProject
-      : handleSaveAbout;
+        ? handleSavePhilosophy
+        : activeTab === "certifications"
+          ? handleSaveCert
+          : activeTab === "experience"
+            ? handleSaveExperience
+            : activeTab === "projects"
+              ? handleSaveProject
+              : handleSaveAbout;
 
   const currentSaveLoading =
     activeTab === "philosophy"
       ? isSavingPhilosophy
       : activeTab === "certifications"
-      ? isSavingCert
-      : activeTab === "experience"
-      ? isSavingExperience
-      : activeTab === "projects"
-      ? isSavingProject
-      : isSavingAbout;
+        ? isSavingCert
+        : activeTab === "experience"
+          ? isSavingExperience
+          : activeTab === "projects"
+            ? isSavingProject
+            : isSavingAbout;
 
   return (
     <div className="min-h-screen bg-[#0b1326] text-[#dae2fd] font-sans antialiased flex flex-col selection:bg-[#5eead4] selection:text-[#00675b]">
@@ -776,106 +781,100 @@ export default function CMSClient({
       <div className="border-b border-[#2d3449]/60 bg-[#060e20]/80 px-4 sm:px-6 py-2.5 sticky top-16 z-40 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <nav className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 w-full md:w-auto">
-            {/* Technical Arsenal & Writing Tab */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("skills");
-                setToast(null);
-              }}
-              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
-                activeTab === "skills"
-                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
-                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
-              }`}
-            >
-              <span className="material-symbols-outlined text-[16px] shrink-0">memory</span>
-              <span className="whitespace-nowrap">Technical Arsenal &amp; Writing</span>
-            </button>
-
-            {/* Philosophy Tab */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("philosophy");
-                setToast(null);
-              }}
-              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
-                activeTab === "philosophy"
-                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
-                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
-              }`}
-            >
-              <span className="material-symbols-outlined text-[16px] shrink-0">psychology</span>
-              <span className="whitespace-nowrap">Philosophy &amp; Words</span>
-            </button>
-
-            {/* Certifications Tab */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("certifications");
-                setToast(null);
-              }}
-              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
-                activeTab === "certifications"
-                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
-                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
-              }`}
-            >
-              <span className="material-symbols-outlined text-[16px] shrink-0">verified</span>
-              <span className="whitespace-nowrap">Certifications ({certificationsList.length})</span>
-            </button>
-
-            {/* Experience Tab */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("experience");
-                setToast(null);
-              }}
-              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
-                activeTab === "experience"
-                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
-                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
-              }`}
-            >
-              <span className="material-symbols-outlined text-[16px] shrink-0">history_edu</span>
-              <span className="whitespace-nowrap">Experience ({experiencesList.length})</span>
-            </button>
-
-            {/* Projects Tab */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("projects");
-                setToast(null);
-              }}
-              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
-                activeTab === "projects"
-                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
-                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
-              }`}
-            >
-              <span className="material-symbols-outlined text-[16px] shrink-0">terminal</span>
-              <span className="whitespace-nowrap">Projects ({projectsList.length})</span>
-            </button>
-
-            {/* About Tab */}
+            {/* About Tab — matches portfolio order: 1st */}
             <button
               type="button"
               onClick={() => {
                 setActiveTab("about");
                 setToast(null);
               }}
-              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
-                activeTab === "about"
-                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
-                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
-              }`}
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${activeTab === "about"
+                ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
+                }`}
             >
               <span className="material-symbols-outlined text-[16px] shrink-0">badge</span>
               <span className="whitespace-nowrap">About Section</span>
+            </button>
+
+            {/* Projects Tab — matches portfolio order: 2nd */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("projects");
+                setToast(null);
+              }}
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${activeTab === "projects"
+                ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
+                }`}
+            >
+              <span className="material-symbols-outlined text-[16px] shrink-0">terminal</span>
+              <span className="whitespace-nowrap">Projects ({projectsList.length})</span>
+            </button>
+
+            {/* Experience Tab — matches portfolio order: 3rd */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("experience");
+                setToast(null);
+              }}
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${activeTab === "experience"
+                ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
+                }`}
+            >
+              <span className="material-symbols-outlined text-[16px] shrink-0">history_edu</span>
+              <span className="whitespace-nowrap">Experience ({experiencesList.length})</span>
+            </button>
+
+            {/* Certifications Tab — matches portfolio order: 4th */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("certifications");
+                setToast(null);
+              }}
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${activeTab === "certifications"
+                ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
+                }`}
+            >
+              <span className="material-symbols-outlined text-[16px] shrink-0">verified</span>
+              <span className="whitespace-nowrap">Certifications ({certificationsList.length})</span>
+            </button>
+
+            {/* Technical Arsenal & Writing Tab — matches portfolio order: 5th */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("skills");
+                setToast(null);
+              }}
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${activeTab === "skills"
+                ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
+                }`}
+            >
+              <span className="material-symbols-outlined text-[16px] shrink-0">memory</span>
+              <span className="whitespace-nowrap">Technical Arsenal</span>
+            </button>
+
+            {/* Philosophy Tab — matches portfolio order: 6th */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("philosophy");
+                setToast(null);
+              }}
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${activeTab === "philosophy"
+                ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
+                }`}
+            >
+              <span className="material-symbols-outlined text-[16px] shrink-0">psychology</span>
+              <span className="whitespace-nowrap">Philosophy</span>
             </button>
           </nav>
 
@@ -890,11 +889,10 @@ export default function CMSClient({
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8">
         {toast && (
           <div
-            className={`mb-6 p-4 rounded-xl font-mono text-xs flex items-center justify-between border ${
-              toast.type === "success"
-                ? "bg-[#5eead4]/10 text-[#5eead4] border-[#5eead4]/30"
-                : "bg-red-950/40 text-red-300 border-red-800/40"
-            }`}
+            className={`mb-6 p-4 rounded-xl font-mono text-xs flex items-center justify-between border ${toast.type === "success"
+              ? "bg-[#5eead4]/10 text-[#5eead4] border-[#5eead4]/30"
+              : "bg-red-950/40 text-red-300 border-red-800/40"
+              }`}
           >
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">
@@ -909,1477 +907,120 @@ export default function CMSClient({
         )}
 
         {/* ============================================================= */}
-        {/* TECHNICAL ARSENAL & WRITING MODULE TAB                        */}
-        {/* ============================================================= */}
-        {activeTab === "skills" && (
-          <div className="space-y-10">
-            {/* Top Toolbar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#2d3449]/50">
-              <div>
-                <h2 className="text-xl font-semibold text-[#dae2fd] flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#5eead4] text-[22px]">terminal</span>
-                  <span>Technical Arsenal &amp; Skill Matrix</span>
-                </h2>
-                <p className="text-xs font-mono text-[#94a3b8] mt-1">
-                  Categorized skills taxonomy displayed on your public portfolio.
-                </p>
-              </div>
-
-              {/* Add New Category Form */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="New category name..."
-                  value={newCategoryTitle}
-                  onChange={(e) => setNewCategoryTitle(e.target.value)}
-                  className="px-3 py-1.5 rounded-lg bg-[#131b2e] border border-[#2d3449] text-xs font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddCategory}
-                  className="px-3.5 py-1.5 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors border border-[#5eead4]/30"
-                >
-                  + Add Category
-                </button>
-              </div>
-            </div>
-
-            {/* Categories Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-              {skillCategoriesList.map((category) => (
-                <div
-                  key={category.id}
-                  className="p-6 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-lg space-y-4"
-                >
-                  <div className="flex items-center justify-between border-b border-[#2d3449]/40 pb-3">
-                    <div>
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#94a3b8]">
-                        CATEGORY #{category.id}
-                      </span>
-                      <h3 className="text-base font-semibold text-[#5eead4]">
-                        {category.title}
-                      </h3>
-                    </div>
-                    {skillCategoriesList.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteCategory(category.id)}
-                        className="text-red-400 hover:text-red-300 p-1"
-                        title="Delete category"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">delete</span>
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Skills Pills */}
-                  <div className="flex flex-wrap gap-2 min-h-[50px] p-3 rounded-xl bg-[#0b1326] border border-[#2d3449]">
-                    {category.skills.map((skill) => (
-                      <span
-                        key={skill}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#222a3d] text-xs font-mono text-[#dae2fd] border border-[#2d3449]"
-                      >
-                        <span>{skill}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveSkillFromCat(category.id, skill)}
-                          className="hover:text-red-400"
-                        >
-                          <span className="material-symbols-outlined text-[13px]">close</span>
-                        </button>
-                      </span>
-                    ))}
-
-                    {/* Add Skill to this category */}
-                    <div className="inline-flex items-center gap-1">
-                      <input
-                        type="text"
-                        placeholder="Add skill..."
-                        value={newSkillInputs[category.id] || ""}
-                        onChange={(e) =>
-                          setNewSkillInputs((prev) => ({
-                            ...prev,
-                            [category.id]: e.target.value,
-                          }))
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            handleAddSkillToCat(category.id);
-                          }
-                        }}
-                        className="bg-transparent text-xs font-mono text-[#5eead4] px-2 py-1 focus:outline-none w-24"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleAddSkillToCat(category.id)}
-                        className="text-xs font-mono text-[#5eead4] hover:underline"
-                      >
-                        + Add
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Technical Writing & Publications Studio */}
-            <div className="pt-8 border-t border-[#2d3449]/50 space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-[#dae2fd] flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[#5eead4] text-[20px]">article</span>
-                    <span>Technical Writing &amp; Substack Publications</span>
-                  </h3>
-                  <p className="text-xs font-mono text-[#94a3b8] mt-0.5">
-                    Manage articles and essays linked to your Substack.
-                  </p>
-                </div>
-              </div>
-
-              {/* Add New Article Form */}
-              <form
-                onSubmit={handleSaveNewArticle}
-                className="p-5 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 grid grid-cols-1 md:grid-cols-12 gap-4 items-end"
-              >
-                <div className="md:col-span-5 space-y-1">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">Article Title</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Mechanical Sympathy and Zero-Copy Serialization"
-                    value={newArticleForm.title || ""}
-                    onChange={(e) => setNewArticleForm((prev) => ({ ...prev, title: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="md:col-span-3 space-y-1">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">Publication / Channel</label>
-                  <input
-                    type="text"
-                    required
-                    value={newArticleForm.publication || ""}
-                    onChange={(e) =>
-                      setNewArticleForm((prev) => ({ ...prev, publication: e.target.value }))
-                    }
-                    className="w-full px-3 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="md:col-span-2 space-y-1">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">Read Time</label>
-                  <input
-                    type="text"
-                    required
-                    value={newArticleForm.read_time || ""}
-                    onChange={(e) =>
-                      setNewArticleForm((prev) => ({ ...prev, read_time: e.target.value }))
-                    }
-                    className="w-full px-3 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <button
-                    type="submit"
-                    disabled={isSavingArticles}
-                    className="w-full py-2 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-colors"
-                  >
-                    + Add Article
-                  </button>
-                </div>
-              </form>
-
-              {/* Articles List */}
-              <div className="space-y-3">
-                {articlesList.map((art) => (
-                  <div
-                    key={art.id}
-                    className="p-4 rounded-xl bg-[#131b2e] border border-[#2d3449]/50 flex items-center justify-between gap-4"
-                  >
-                    <div>
-                      <h4 className="text-sm font-medium text-[#dae2fd]">{art.title}</h4>
-                      <p className="text-xs font-mono text-[#94a3b8] mt-1 flex items-center gap-2">
-                        <span>{art.publication}</span>
-                        <span>•</span>
-                        <span>{art.read_time}</span>
-                        <span>•</span>
-                        <span>{art.year}</span>
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={art.url}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="px-2.5 py-1 rounded bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4]"
-                      >
-                        Visit ↗
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteArticle(art.id)}
-                        className="text-red-400 hover:text-red-300 p-1"
-                        title="Delete article"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">delete</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================= */}
-        {/* PHILOSOPHY MODULE TAB                                         */}
-        {/* ============================================================= */}
-        {activeTab === "philosophy" && (
-          <form
-            onSubmit={handleSavePhilosophy}
-            className="max-w-4xl mx-auto p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
-          >
-            <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
-              <div>
-                <span className="text-xs font-mono text-[#94a3b8]">EDITORIAL PRINCIPLES</span>
-                <h3 className="text-lg font-semibold text-[#dae2fd]">
-                  Beyond the Code / Philosophy Studio
-                </h3>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSavingPhilosophy}
-                className="px-4 py-1.5 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-all disabled:opacity-50"
-              >
-                {isSavingPhilosophy ? "Saving..." : "Update Principle"}
-              </button>
-            </div>
-
-            {/* Principle Tag & Title */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                  Principle Tag Header
-                </label>
-                <input
-                  type="text"
-                  value={philosophyForm.principle_tag}
-                  onChange={(e) =>
-                    setPhilosophyForm((prev) => ({
-                      ...prev,
-                      principle_tag: e.target.value,
-                    }))
-                  }
-                  required
-                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#5eead4] focus:border-[#5eead4] focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                  Section Title
-                </label>
-                <input
-                  type="text"
-                  value={philosophyForm.title}
-                  onChange={(e) =>
-                    setPhilosophyForm((prev) => ({
-                      ...prev,
-                      title: e.target.value,
-                    }))
-                  }
-                  required
-                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Paragraph 1 */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                Paragraph 1 (The Role of Engineers in the AI Era)
-              </label>
-              <textarea
-                rows={4}
-                value={philosophyForm.paragraph1}
-                onChange={(e) =>
-                  setPhilosophyForm((prev) => ({
-                    ...prev,
-                    paragraph1: e.target.value,
-                  }))
-                }
-                required
-                className="w-full px-4 py-3 rounded-xl bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none resize-none leading-relaxed"
-              />
-            </div>
-
-            {/* Paragraph 2 */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                Paragraph 2 (Engineering Judgment &amp; Dependability)
-              </label>
-              <textarea
-                rows={4}
-                value={philosophyForm.paragraph2}
-                onChange={(e) =>
-                  setPhilosophyForm((prev) => ({
-                    ...prev,
-                    paragraph2: e.target.value,
-                  }))
-                }
-                required
-                className="w-full px-4 py-3 rounded-xl bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none resize-none leading-relaxed"
-              />
-            </div>
-
-            {/* Colophon & Copyright */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#2d3449]/40">
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                  Colophon Stack Text
-                </label>
-                <input
-                  type="text"
-                  value={philosophyForm.footer_text}
-                  onChange={(e) =>
-                    setPhilosophyForm((prev) => ({
-                      ...prev,
-                      footer_text: e.target.value,
-                    }))
-                  }
-                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-xs font-mono text-[#94a3b8] focus:border-[#5eead4] focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                  Copyright Notice
-                </label>
-                <input
-                  type="text"
-                  value={philosophyForm.copyright}
-                  onChange={(e) =>
-                    setPhilosophyForm((prev) => ({
-                      ...prev,
-                      copyright: e.target.value,
-                    }))
-                  }
-                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-xs font-mono text-[#94a3b8] focus:border-[#5eead4] focus:outline-none"
-                />
-              </div>
-            </div>
-          </form>
-        )}
-
-        {/* ============================================================= */}
-        {/* CERTIFICATIONS MODULE TAB                                     */}
-        {/* ============================================================= */}
-        {activeTab === "certifications" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-5 flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-base font-semibold text-[#dae2fd]">Verified Credentials</h2>
-                  <span className="text-xs font-mono text-[#94a3b8]">{certificationsList.length} entries</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleCreateNewCert}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors border border-[#5eead4]/30"
-                >
-                  <span className="material-symbols-outlined text-[16px]">add</span>
-                  <span>+ New Cert</span>
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                {certificationsList.map((cert) => {
-                  const isSelected = selectedCertId === cert.id;
-                  return (
-                    <div
-                      key={cert.id}
-                      onClick={() => handleSelectCert(cert)}
-                      className={`p-4 rounded-xl transition-all cursor-pointer border ${
-                        isSelected
-                          ? "bg-[#222a3d] border-[#5eead4]/40 shadow-[0_0_20px_-6px_rgba(94,234,212,0.15)]"
-                          : "bg-[#131b2e] border-[#2d3449]/40 hover:bg-[#171f33]"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[#5eead4]/20 text-[#5eead4]">
-                            {cert.category.toUpperCase()}
-                          </span>
-                          <span className="text-xs font-mono text-[#94a3b8]">{cert.year}</span>
-                        </div>
-                        <span className="material-symbols-outlined text-[18px] text-[#5eead4]">
-                          {cert.icon || "verified"}
-                        </span>
-                      </div>
-
-                      <h4
-                        className={`text-sm font-semibold transition-colors ${
-                          isSelected ? "text-[#5eead4]" : "text-[#dae2fd]"
-                        }`}
-                      >
-                        {cert.title}
-                      </h4>
-
-                      <p className="text-xs text-[#94a3b8] mt-0.5">{cert.issuer}</p>
-
-                      <div className="flex items-center justify-between mt-3 text-xs font-mono text-[#94a3b8]">
-                        <span className="truncate max-w-[200px] text-[#859490]">{cert.code}</span>
-                        {certificationsList.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteCert(cert.id);
-                            }}
-                            className="text-red-400 hover:text-red-300 p-1"
-                            title="Delete credential"
-                          >
-                            <span className="material-symbols-outlined text-[16px]">
-                              delete
-                            </span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <form
-              onSubmit={handleSaveCert}
-              className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
-            >
-              <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
-                <div>
-                  <span className="text-xs font-mono text-[#94a3b8]">
-                    CREDENTIAL RECORD · {certForm.code || certForm.id}
-                  </span>
-                  <h3 className="text-lg font-semibold text-[#dae2fd]">
-                    Edit: {certForm.title || "Untitled Credential"}
-                  </h3>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const orig = certificationsList.find((c) => c.id === selectedCertId);
-                      if (orig) setCertForm(orig);
-                      setToast(null);
-                    }}
-                    className="px-3.5 py-1.5 rounded-lg border border-[#2d3449] hover:bg-[#171f33] text-xs font-mono text-[#dae2fd] transition-colors"
-                  >
-                    Discard
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSavingCert}
-                    className="px-4 py-1.5 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-all disabled:opacity-50"
-                  >
-                    {isSavingCert ? "Saving..." : "Save Credential"}
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Certification Title
-                  </label>
-                  <input
-                    type="text"
-                    value={certForm.title}
-                    onChange={(e) =>
-                      setCertForm((prev) => ({ ...prev, title: e.target.value }))
-                    }
-                    required
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Issuing Authority
-                  </label>
-                  <input
-                    type="text"
-                    value={certForm.issuer}
-                    onChange={(e) =>
-                      setCertForm((prev) => ({ ...prev, issuer: e.target.value }))
-                    }
-                    required
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Credential Serial / ID
-                  </label>
-                  <input
-                    type="text"
-                    value={certForm.code}
-                    onChange={(e) =>
-                      setCertForm((prev) => ({ ...prev, code: e.target.value }))
-                    }
-                    required
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Year Issued
-                  </label>
-                  <input
-                    type="text"
-                    value={certForm.year}
-                    onChange={(e) =>
-                      setCertForm((prev) => ({ ...prev, year: e.target.value }))
-                    }
-                    required
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Category Tag
-                  </label>
-                  <input
-                    type="text"
-                    value={certForm.category}
-                    onChange={(e) =>
-                      setCertForm((prev) => ({ ...prev, category: e.target.value }))
-                    }
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#5eead4] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Domain Track
-                  </label>
-                  <input
-                    type="text"
-                    value={certForm.track}
-                    onChange={(e) =>
-                      setCertForm((prev) => ({ ...prev, track: e.target.value }))
-                    }
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Validity Period
-                  </label>
-                  <input
-                    type="text"
-                    value={certForm.validity}
-                    onChange={(e) =>
-                      setCertForm((prev) => ({ ...prev, validity: e.target.value }))
-                    }
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Material Icon Name
-                  </label>
-                  <input
-                    type="text"
-                    value={certForm.icon}
-                    onChange={(e) =>
-                      setCertForm((prev) => ({ ...prev, icon: e.target.value }))
-                    }
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#5eead4] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                  Official Registry Verification Link
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    value={certForm.verify_url}
-                    onChange={(e) =>
-                      setCertForm((prev) => ({ ...prev, verify_url: e.target.value }))
-                    }
-                    required
-                    className="flex-1 px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                  <a
-                    href={certForm.verify_url}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="px-3.5 py-2 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors flex items-center gap-1 shrink-0"
-                  >
-                    <span>Test ↗</span>
-                  </a>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                  Lightbox Verification Description
-                </label>
-                <textarea
-                  rows={3}
-                  value={certForm.description}
-                  onChange={(e) =>
-                    setCertForm((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  required
-                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none resize-none leading-relaxed"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase block">
-                  Verified Competencies &amp; Syllabi
-                </label>
-                <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-[#0b1326] border border-[#2d3449]">
-                  {certForm.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#222a3d] text-xs font-mono text-[#5eead4] border border-[#5eead4]/30"
-                    >
-                      <span>{skill}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveCertSkill(skill)}
-                        className="hover:text-red-400"
-                      >
-                        <span className="material-symbols-outlined text-[13px]">
-                          close
-                        </span>
-                      </button>
-                    </span>
-                  ))}
-
-                  <div className="inline-flex items-center gap-1">
-                    <input
-                      type="text"
-                      placeholder="Add competency..."
-                      value={newCertSkill}
-                      onChange={(e) => setNewCertSkill(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddCertSkill();
-                        }
-                      }}
-                      className="bg-transparent text-xs font-mono text-[#dae2fd] px-2 py-1 focus:outline-none w-32"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddCertSkill}
-                      className="text-xs font-mono text-[#5eead4] hover:underline"
-                    >
-                      + Add
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {/* ============================================================= */}
-        {/* EXPERIENCE MODULE TAB                                         */}
-        {/* ============================================================= */}
-        {activeTab === "experience" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-5 flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-base font-semibold text-[#dae2fd]">Career Positions</h2>
-                  <span className="text-xs font-mono text-[#94a3b8]">{experiencesList.length} entries</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleCreateNewExperience}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors border border-[#5eead4]/30"
-                >
-                  <span className="material-symbols-outlined text-[16px]">add</span>
-                  <span>+ New Role</span>
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                {experiencesList.map((exp) => {
-                  const isSelected = selectedExperienceId === exp.id;
-                  return (
-                    <div
-                      key={exp.id}
-                      onClick={() => handleSelectExperience(exp)}
-                      className={`p-4 rounded-xl transition-all cursor-pointer border ${
-                        isSelected
-                          ? "bg-[#222a3d] border-[#5eead4]/40 shadow-[0_0_20px_-6px_rgba(94,234,212,0.15)]"
-                          : "bg-[#131b2e] border-[#2d3449]/40 hover:bg-[#171f33]"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[#5eead4]/20 text-[#5eead4]">
-                          {exp.period}
-                        </span>
-                        <span className="text-xs font-mono text-[#94a3b8]">#{exp.id}</span>
-                      </div>
-
-                      <h4
-                        className={`text-sm font-semibold transition-colors ${
-                          isSelected ? "text-[#5eead4]" : "text-[#dae2fd]"
-                        }`}
-                      >
-                        {exp.role} · {exp.company}
-                      </h4>
-
-                      <p className="text-xs text-[#94a3b8] mt-0.5 font-mono">{exp.tagline}</p>
-
-                      <p className="text-xs text-[#bbcac5] mt-2 line-clamp-2 leading-relaxed">
-                        {exp.description}
-                      </p>
-
-                      <div className="flex items-center justify-between mt-3 text-xs font-mono text-[#94a3b8]">
-                        <div className="flex flex-wrap gap-1">
-                          {exp.skills.slice(0, 3).map((s) => (
-                            <span key={s} className="px-1.5 py-0.5 rounded bg-[#0b1326] text-[10px]">
-                              {s}
-                            </span>
-                          ))}
-                          {exp.skills.length > 3 && (
-                            <span className="text-[10px]">+{exp.skills.length - 3}</span>
-                          )}
-                        </div>
-
-                        {experiencesList.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteExperience(exp.id);
-                            }}
-                            className="text-red-400 hover:text-red-300 p-1"
-                            title="Delete role"
-                          >
-                            <span className="material-symbols-outlined text-[16px]">
-                              delete
-                            </span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <form
-              onSubmit={handleSaveExperience}
-              className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
-            >
-              <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
-                <div>
-                  <span className="text-xs font-mono text-[#94a3b8]">
-                    {experienceForm.id === 0 ? "NEW ROLE ENTRY" : `EXPERIENCE RECORD · #${experienceForm.id}`}
-                  </span>
-                  <h3 className="text-lg font-semibold text-[#dae2fd]">
-                    Edit: {experienceForm.role || "Untitled Position"}
-                  </h3>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const orig = experiencesList.find((e) => e.id === selectedExperienceId);
-                      if (orig) setExperienceForm(orig);
-                      setToast(null);
-                    }}
-                    className="px-3.5 py-1.5 rounded-lg border border-[#2d3449] hover:bg-[#171f33] text-xs font-mono text-[#dae2fd] transition-colors"
-                  >
-                    Discard
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSavingExperience}
-                    className="px-4 py-1.5 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-all disabled:opacity-50"
-                  >
-                    {isSavingExperience ? "Saving..." : "Save Changes"}
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Role Title
-                  </label>
-                  <input
-                    type="text"
-                    value={experienceForm.role}
-                    onChange={(e) =>
-                      setExperienceForm((prev) => ({ ...prev, role: e.target.value }))
-                    }
-                    required
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Company Name
-                  </label>
-                  <input
-                    type="text"
-                    value={experienceForm.company}
-                    onChange={(e) =>
-                      setExperienceForm((prev) => ({ ...prev, company: e.target.value }))
-                    }
-                    required
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Time Period
-                  </label>
-                  <input
-                    type="text"
-                    value={experienceForm.period}
-                    onChange={(e) =>
-                      setExperienceForm((prev) => ({ ...prev, period: e.target.value }))
-                    }
-                    required
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Tagline Sub-Title
-                  </label>
-                  <input
-                    type="text"
-                    value={experienceForm.tagline}
-                    onChange={(e) =>
-                      setExperienceForm((prev) => ({ ...prev, tagline: e.target.value }))
-                    }
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                  Role Engineering Summary &amp; Key Achievements
-                </label>
-                <textarea
-                  rows={4}
-                  value={experienceForm.description}
-                  onChange={(e) =>
-                    setExperienceForm((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  required
-                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none resize-none leading-relaxed"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase block">
-                  Technologies Used &amp; Key Tools
-                </label>
-                <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-[#0b1326] border border-[#2d3449]">
-                  {experienceForm.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#222a3d] text-xs font-mono text-[#5eead4] border border-[#5eead4]/30"
-                    >
-                      <span>{skill}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveExpSkill(skill)}
-                        className="hover:text-red-400"
-                      >
-                        <span className="material-symbols-outlined text-[13px]">
-                          close
-                        </span>
-                      </button>
-                    </span>
-                  ))}
-
-                  <div className="inline-flex items-center gap-1">
-                    <input
-                      type="text"
-                      placeholder="Add tech..."
-                      value={newExpSkill}
-                      onChange={(e) => setNewExpSkill(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddExpSkill();
-                        }
-                      }}
-                      className="bg-transparent text-xs font-mono text-[#dae2fd] px-2 py-1 focus:outline-none w-24"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddExpSkill}
-                      className="text-xs font-mono text-[#5eead4] hover:underline"
-                    >
-                      + Add
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {/* ============================================================= */}
-        {/* PROJECTS MODULE TAB                                           */}
-        {/* ============================================================= */}
-        {activeTab === "projects" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-5 flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-base font-semibold text-[#dae2fd]">Systems &amp; Repositories</h2>
-                  <span className="text-xs font-mono text-[#94a3b8]">{projectsList.length} entries</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleCreateNewProject}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors border border-[#5eead4]/30"
-                >
-                  <span className="material-symbols-outlined text-[16px]">add</span>
-                  <span>+ New Project</span>
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                {projectsList.map((project) => {
-                  const isSelected = selectedProjectId === project.id;
-                  return (
-                    <div
-                      key={project.id}
-                      onClick={() => handleSelectProject(project)}
-                      className={`p-4 rounded-xl transition-all cursor-pointer border ${
-                        isSelected
-                          ? "bg-[#222a3d] border-[#5eead4]/40 shadow-[0_0_20px_-6px_rgba(94,234,212,0.15)]"
-                          : "bg-[#131b2e] border-[#2d3449]/40 hover:bg-[#171f33]"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[#5eead4]/20 text-[#5eead4]">
-                            #{project.id}
-                          </span>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono text-[#94a3b8] bg-[#0b1326]">
-                            {project.skills[0] || "SYSTEM"}
-                          </span>
-                        </div>
-                        <span className="text-xs font-mono text-[#94a3b8]">
-                          ★ {project.stars}
-                        </span>
-                      </div>
-
-                      <h4
-                        className={`text-sm font-semibold transition-colors ${
-                          isSelected ? "text-[#5eead4]" : "text-[#dae2fd]"
-                        }`}
-                      >
-                        {project.title}
-                      </h4>
-
-                      <p className="text-xs text-[#bbcac5] mt-1 line-clamp-2">
-                        {project.description}
-                      </p>
-
-                      <div className="flex items-center justify-between mt-3 text-xs font-mono text-[#94a3b8]">
-                        <span className="truncate max-w-[200px]">{project.url}</span>
-                        {projectsList.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteProject(project.id);
-                            }}
-                            className="text-red-400 hover:text-red-300 p-1"
-                            title="Delete project"
-                          >
-                            <span className="material-symbols-outlined text-[16px]">
-                              delete
-                            </span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <form
-              onSubmit={handleSaveProject}
-              className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
-            >
-              <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
-                <div>
-                  <span className="text-xs font-mono text-[#94a3b8]">
-                    {projectForm.id === 0 ? "NEW PROJECT ENTRY" : `PROJECT SPEC · #${projectForm.id}`}
-                  </span>
-                  <h3 className="text-lg font-semibold text-[#dae2fd]">
-                    Edit: {projectForm.title || "Untitled Project"}
-                  </h3>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const orig = projectsList.find((p) => p.id === selectedProjectId);
-                      if (orig) setProjectForm(orig);
-                      setToast(null);
-                    }}
-                    className="px-3.5 py-1.5 rounded-lg border border-[#2d3449] hover:bg-[#171f33] text-xs font-mono text-[#dae2fd] transition-colors"
-                  >
-                    Discard
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSavingProject}
-                    className="px-4 py-1.5 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-all disabled:opacity-50"
-                  >
-                    {isSavingProject ? "Saving..." : "Save Project"}
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Project Title
-                  </label>
-                  <input
-                    type="text"
-                    value={projectForm.title}
-                    onChange={(e) =>
-                      setProjectForm((prev) => ({ ...prev, title: e.target.value }))
-                    }
-                    required
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Repository Link
-                  </label>
-                  <input
-                    type="url"
-                    value={projectForm.url}
-                    onChange={(e) =>
-                      setProjectForm((prev) => ({ ...prev, url: e.target.value }))
-                    }
-                    required
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                  Architecture Description
-                </label>
-                <textarea
-                  rows={3}
-                  value={projectForm.description}
-                  onChange={(e) =>
-                    setProjectForm((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  required
-                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none resize-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    GitHub Stars Count
-                  </label>
-                  <input
-                    type="text"
-                    value={projectForm.stars}
-                    onChange={(e) =>
-                      setProjectForm((prev) => ({ ...prev, stars: e.target.value }))
-                    }
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Forks Count
-                  </label>
-                  <input
-                    type="text"
-                    value={projectForm.forks}
-                    onChange={(e) =>
-                      setProjectForm((prev) => ({ ...prev, forks: e.target.value }))
-                    }
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase block">
-                  Technologies &amp; Tags
-                </label>
-                <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-[#0b1326] border border-[#2d3449]">
-                  {projectForm.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#222a3d] text-xs font-mono text-[#5eead4] border border-[#5eead4]/30"
-                    >
-                      <span>{skill}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveProjectTag(skill)}
-                        className="hover:text-red-400"
-                      >
-                        <span className="material-symbols-outlined text-[13px]">
-                          close
-                        </span>
-                      </button>
-                    </span>
-                  ))}
-
-                  <div className="inline-flex items-center gap-1">
-                    <input
-                      type="text"
-                      placeholder="Add tag..."
-                      value={newProjectTag}
-                      onChange={(e) => setNewProjectTag(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddProjectTag();
-                        }
-                      }}
-                      className="bg-transparent text-xs font-mono text-[#dae2fd] px-2 py-1 focus:outline-none w-24"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddProjectTag}
-                      className="text-xs font-mono text-[#5eead4] hover:underline"
-                    >
-                      + Add
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2 pt-2 border-t border-[#2d3449]/40">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase block">
-                  Project Thumbnail Architecture Asset (Hashed Storage)
-                </label>
-                <div className="p-4 rounded-xl bg-[#0b1326] border border-[#2d3449] flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-20 h-14 rounded-lg bg-[#222a3d] border border-[#2d3449] overflow-hidden shrink-0">
-                      <Image
-                        src={projectForm.image_url}
-                        alt={projectForm.image_alt || projectForm.title}
-                        width={80}
-                        height={56}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <div className="text-xs font-mono text-[#dae2fd] truncate max-w-[240px]">
-                        {projectForm.image_url}
-                      </div>
-                      <div className="text-[11px] font-mono text-[#94a3b8]">
-                        Stored with random hash in /public/uploads/
-                      </div>
-                    </div>
-                  </div>
-
-                  <label className="cursor-pointer px-3.5 py-1.5 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#e2e8f0] transition-colors border border-[#2d3449]">
-                    <span>{isUploadingImage ? "Hashing & Uploading..." : "Replace File"}</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageFileChange}
-                      className="hidden"
-                      disabled={isUploadingImage}
-                    />
-                  </label>
-                </div>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {/* ============================================================= */}
-        {/* ABOUT MODULE TAB                                              */}
+        {/* COMPARTMENTALIZED MODULE VIEWS                                */}
         {/* ============================================================= */}
         {activeTab === "about" && (
-          <form
+          <AboutModule
+            aboutData={aboutData}
+            initialAbout={initialAbout}
+            isSaving={isSavingAbout}
+            onChange={(updated) => setAboutData(updated)}
+            onDiscard={() => {
+              setAboutData(initialAbout);
+              setToast(null);
+            }}
             onSubmit={handleSaveAbout}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
-          >
-            <div className="lg:col-span-5 flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold text-[#dae2fd] flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#5eead4] text-[18px]">
-                    visibility
-                  </span>
-                  <span>Real-Time Preview</span>
-                </h2>
-                <span className="text-xs font-mono text-[#94a3b8]">Live Reflection</span>
-              </div>
+          />
+        )}
 
-              <div className="p-6 rounded-2xl bg-[#171f33]/60 border border-[#2d3449]/60 shadow-lg space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2d3449]/40">
-                  <span className="font-mono text-xs uppercase tracking-wider text-[#5eead4] font-medium">
-                    Portfolio · About Me
-                  </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#5eead4]/10 text-[#5eead4] border border-[#5eead4]/20">
-                    SQLITE SYNC
-                  </span>
-                </div>
+        {activeTab === "projects" && (
+          <ProjectsModule
+            projectsList={projectsList}
+            projectForm={projectForm}
+            selectedProjectId={selectedProjectId}
+            newProjectTag={newProjectTag}
+            isSaving={isSavingProject}
+            isUploadingImage={isUploadingImage}
+            onSelect={handleSelectProject}
+            onCreate={handleCreateNewProject}
+            onFormChange={(updated) => setProjectForm(updated)}
+            onTagChange={(val) => setNewProjectTag(val)}
+            onAddTag={handleAddProjectTag}
+            onRemoveTag={handleRemoveProjectTag}
+            onImageChange={handleImageFileChange}
+            onSubmit={handleSaveProject}
+            onDiscard={() => {
+              const orig = projectsList.find((p) => p.id === selectedProjectId);
+              if (orig) setProjectForm(orig);
+              setToast(null);
+            }}
+            onDelete={handleDeleteProject}
+          />
+        )}
 
-                <div className="space-y-3 text-xs text-[#bbcac5] leading-relaxed">
-                  <p className="line-clamp-4">{aboutData.paragraph1}</p>
-                  <p className="line-clamp-4">{aboutData.paragraph2}</p>
-                  <p className="line-clamp-3">{aboutData.paragraph3}</p>
-                </div>
+        {activeTab === "experience" && (
+          <ExperienceModule
+            experiencesList={experiencesList}
+            experienceForm={experienceForm}
+            selectedExperienceId={selectedExperienceId}
+            newExpSkill={newExpSkill}
+            isSaving={isSavingExperience}
+            onSelect={handleSelectExperience}
+            onCreate={handleCreateNewExperience}
+            onFormChange={(updated) => setExperienceForm(updated)}
+            onSkillInputChange={(val) => setNewExpSkill(val)}
+            onAddSkill={handleAddExpSkill}
+            onRemoveSkill={handleRemoveExpSkill}
+            onSubmit={handleSaveExperience}
+            onDiscard={() => {
+              const orig = experiencesList.find((e) => e.id === selectedExperienceId);
+              if (orig) setExperienceForm(orig);
+              setToast(null);
+            }}
+            onDelete={handleDeleteExperience}
+          />
+        )}
 
-                <div className="mt-4 p-3.5 rounded-xl bg-[#131b2e] border border-[#2d3449] shadow-sm">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#222a3d]">
-                    <span className="font-mono text-[10px] text-[#94a3b8] uppercase tracking-wider flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#5eead4] animate-pulse" />
-                      Runtime Node
-                    </span>
-                    <span className="font-mono text-[10px] text-[#5eead4] font-medium">
-                      {aboutData.runtime_version}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 mt-2 pt-1 text-left">
-                    <div>
-                      <span className="font-mono text-[10px] text-[#94a3b8] block">
-                        Target QPS
-                      </span>
-                      <span className="font-mono text-xs text-[#e2e8f0] font-semibold">
-                        {aboutData.target_qps}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-mono text-[10px] text-[#94a3b8] block">
-                        Consensus
-                      </span>
-                      <span className="font-mono text-xs text-[#e2e8f0] font-semibold">
-                        {aboutData.consensus}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-mono text-[10px] text-[#94a3b8] block">
-                        p99 Latency
-                      </span>
-                      <span className="font-mono text-xs text-[#5eead4] font-semibold">
-                        {aboutData.p99_latency}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {activeTab === "certifications" && (
+          <CertificationsModule
+            certificationsList={certificationsList}
+            certForm={certForm}
+            selectedCertId={selectedCertId}
+            newCertSkill={newCertSkill}
+            isSaving={isSavingCert}
+            onSelectCert={handleSelectCert}
+            onCreateNewCert={handleCreateNewCert}
+            onDeleteCert={handleDeleteCert}
+            onChangeForm={setCertForm}
+            onDiscard={() => {
+              const orig = certificationsList.find((c) => c.id === selectedCertId);
+              if (orig) setCertForm(orig);
+              setToast(null);
+            }}
+            onSubmit={handleSaveCert}
+            setNewCertSkill={setNewCertSkill}
+            onAddCertSkill={handleAddCertSkill}
+            onRemoveCertSkill={handleRemoveCertSkill}
+          />
+        )}
 
-            <div className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6">
-              <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
-                <div>
-                  <span className="text-xs font-mono text-[#94a3b8]">SECTION CONTENT</span>
-                  <h3 className="text-lg font-semibold text-[#dae2fd]">
-                    Edit About Narrative &amp; Telemetry
-                  </h3>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setAboutData(initialAbout)}
-                    className="px-3.5 py-1.5 rounded-lg border border-[#2d3449] hover:bg-[#171f33] text-xs font-mono text-[#dae2fd] transition-colors"
-                  >
-                    Discard
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSavingAbout}
-                    className="px-4 py-1.5 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-all disabled:opacity-50"
-                  >
-                    {isSavingAbout ? "Saving..." : "Save Section"}
-                  </button>
-                </div>
-              </div>
+        {activeTab === "skills" && (
+          <SkillsModule
+            skillCategoriesList={skillCategoriesList}
+            newCategoryTitle={newCategoryTitle}
+            newSkillInputs={newSkillInputs}
+            articlesList={articlesList}
+            newArticleForm={newArticleForm}
+            isSavingArticles={isSavingArticles}
+            setNewCategoryTitle={setNewCategoryTitle}
+            setNewSkillInputs={setNewSkillInputs}
+            setNewArticleForm={setNewArticleForm}
+            onAddCategory={handleAddCategory}
+            onDeleteCategory={handleDeleteCategory}
+            onAddSkillToCat={handleAddSkillToCat}
+            onRemoveSkillFromCat={handleRemoveSkillFromCat}
+            onSaveNewArticle={handleSaveNewArticle}
+            onDeleteArticle={handleDeleteArticle}
+          />
+        )}
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase tracking-wide">
-                  Paragraph 1: Background &amp; Origins
-                </label>
-                <textarea
-                  name="paragraph1"
-                  rows={3}
-                  value={aboutData.paragraph1}
-                  onChange={(e) =>
-                    setAboutData((prev) => ({ ...prev, paragraph1: e.target.value }))
-                  }
-                  className="w-full px-4 py-3 rounded-xl bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase tracking-wide">
-                  Paragraph 2: Engineering Philosophy &amp; Tooling
-                </label>
-                <textarea
-                  name="paragraph2"
-                  rows={4}
-                  value={aboutData.paragraph2}
-                  onChange={(e) =>
-                    setAboutData((prev) => ({ ...prev, paragraph2: e.target.value }))
-                  }
-                  className="w-full px-4 py-3 rounded-xl bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase tracking-wide">
-                  Paragraph 3: Current Research &amp; Interests
-                </label>
-                <textarea
-                  name="paragraph3"
-                  rows={3}
-                  value={aboutData.paragraph3}
-                  onChange={(e) =>
-                    setAboutData((prev) => ({ ...prev, paragraph3: e.target.value }))
-                  }
-                  className="w-full px-4 py-3 rounded-xl bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                />
-              </div>
-
-              <div className="pt-2 border-t border-[#2d3449]/40 space-y-4">
-                <span className="font-mono text-xs uppercase tracking-wider text-[#5eead4] font-medium block">
-                  Telemetry Widget Metric Controls
-                </span>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                      Runtime Version Tag
-                    </label>
-                    <input
-                      type="text"
-                      name="runtime_version"
-                      value={aboutData.runtime_version}
-                      onChange={(e) =>
-                        setAboutData((prev) => ({
-                          ...prev,
-                          runtime_version: e.target.value,
-                        }))
-                      }
-                      className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#5eead4] focus:border-[#5eead4] focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                      Target QPS Throughput
-                    </label>
-                    <input
-                      type="text"
-                      name="target_qps"
-                      value={aboutData.target_qps}
-                      onChange={(e) =>
-                        setAboutData((prev) => ({
-                          ...prev,
-                          target_qps: e.target.value,
-                        }))
-                      }
-                      className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                      Consensus Protocol Engine
-                    </label>
-                    <input
-                      type="text"
-                      name="consensus"
-                      value={aboutData.consensus}
-                      onChange={(e) =>
-                        setAboutData((prev) => ({
-                          ...prev,
-                          consensus: e.target.value,
-                        }))
-                      }
-                      className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                      p99 Latency Threshold
-                    </label>
-                    <input
-                      type="text"
-                      name="p99_latency"
-                      value={aboutData.p99_latency}
-                      onChange={(e) =>
-                        setAboutData((prev) => ({
-                          ...prev,
-                          p99_latency: e.target.value,
-                        }))
-                      }
-                      className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#5eead4] focus:border-[#5eead4] focus:outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
+        {activeTab === "philosophy" && (
+          <PhilosophyModule
+            philosophyForm={philosophyForm}
+            isSaving={isSavingPhilosophy}
+            onChangeForm={setPhilosophyForm}
+            onSubmit={handleSavePhilosophy}
+          />
         )}
       </main>
     </div>

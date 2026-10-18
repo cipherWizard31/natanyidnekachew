@@ -26,7 +26,7 @@ export default function About({ about }: AboutProps) {
         <p>{about.paragraph3}</p>
       </div>
 
-      {/* Live Telemetry / Core Architecture Callout Widget from SQLite DB */}
+      {/* Client Stats & Engineering Impact Callout Widget from SQLite DB */}
       <div className="mt-6 p-4 rounded-xl bg-[#171f33]/70 border border-[#2d3449]/60 shadow-sm backdrop-blur-sm">
         <div className="flex items-center justify-between pb-2 border-b border-[#2d3449]/40">
           <span className="font-mono text-xs text-[#94a3b8] uppercase tracking-wider flex items-center gap-2">
@@ -34,38 +34,38 @@ export default function About({ about }: AboutProps) {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5eead4] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#5eead4]"></span>
             </span>
-            Runtime Architecture Node
+            Client Stats &amp; Impact
           </span>
           <span className="font-mono text-xs text-[#5eead4] font-medium bg-[#5eead4]/10 px-2 py-0.5 rounded-full border border-[#5eead4]/20">
-            {about.runtime_version}
+            {about.stat_experience || "4+ Yrs"} Experience
           </span>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-3 pt-1 text-left">
           <div className="flex flex-col">
             <span className="font-mono text-[11px] text-[#94a3b8] uppercase tracking-wide">
-              Target QPS
+              Shipped Projects
             </span>
             <span className="font-mono text-base md:text-lg text-[#e2e8f0] font-semibold">
-              {about.target_qps}
+              {about.stat_projects || "12+"}
             </span>
           </div>
 
           <div className="flex flex-col">
             <span className="font-mono text-[11px] text-[#94a3b8] uppercase tracking-wide">
-              Consensus
+              Active Users
             </span>
             <span className="font-mono text-base md:text-lg text-[#e2e8f0] font-semibold">
-              {about.consensus}
+              {about.stat_users || "50K+"}
             </span>
           </div>
 
           <div className="flex flex-col">
             <span className="font-mono text-[11px] text-[#94a3b8] uppercase tracking-wide">
-              p99 Latency
+              System Uptime
             </span>
             <span className="font-mono text-base md:text-lg text-[#5eead4] font-semibold">
-              {about.p99_latency}
+              {about.stat_uptime || "99.99%"}
             </span>
           </div>
         </div>

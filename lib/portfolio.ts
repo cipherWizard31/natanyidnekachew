@@ -27,6 +27,10 @@ export interface AboutData {
   target_qps: string;
   consensus: string;
   p99_latency: string;
+  stat_projects?: string;
+  stat_users?: string;
+  stat_uptime?: string;
+  stat_experience?: string;
 }
 
 export interface ProjectData {
