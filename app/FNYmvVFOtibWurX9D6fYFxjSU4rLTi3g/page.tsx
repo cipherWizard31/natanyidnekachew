@@ -13,6 +13,10 @@ export default function CMSPage() {
   const data = getPortfolioData();
 
   return (
-    <CMSClient initialAbout={data.about} initialProjects={data.projects} />
+    <CMSClient
+      initialAbout={data.about}
+      initialProjects={data.projects}
+      initialExperiences={data.experiences}
+    />
   );
 }

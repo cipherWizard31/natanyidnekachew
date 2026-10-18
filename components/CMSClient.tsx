@@ -3,19 +3,21 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { AboutData, ProjectData } from "@/lib/portfolio";
+import type { AboutData, ProjectData, ExperienceData } from "@/lib/portfolio";
 
 interface CMSClientProps {
   initialAbout: AboutData;
   initialProjects: ProjectData[];
+  initialExperiences: ExperienceData[];
 }
 
 export default function CMSClient({
   initialAbout,
   initialProjects,
+  initialExperiences,
 }: CMSClientProps) {
   // Navigation tab state
-  const [activeTab, setActiveTab] = useState<"about" | "projects">("projects");
+  const [activeTab, setActiveTab] = useState<"projects" | "experience" | "about">("experience");
 
   // About form state
   const [aboutData, setAboutData] = useState<AboutData>(initialAbout);
@@ -27,7 +29,6 @@ export default function CMSClient({
     initialProjects.length > 0 ? initialProjects[0].id : null
   );
 
-  // Active project being edited
   const selectedProject =
     projectsList.find((p) => p.id === selectedProjectId) ||
     projectsList[0] || {
@@ -44,27 +45,161 @@ export default function CMSClient({
     };
 
   const [projectForm, setProjectForm] = useState<ProjectData>(selectedProject);
-  const [newTagInput, setNewTagInput] = useState("");
+  const [newProjectTag, setNewProjectTag] = useState("");
   const [isSavingProject, setIsSavingProject] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
-  // Toast / feedback message
+  // Experience state
+  const [experiencesList, setExperiencesList] = useState<ExperienceData[]>(initialExperiences);
+  const [selectedExperienceId, setSelectedExperienceId] = useState<number | null>(
+    initialExperiences.length > 0 ? initialExperiences[0].id : null
+  );
+
+  const selectedExperience =
+    experiencesList.find((e) => e.id === selectedExperienceId) ||
+    experiencesList[0] || {
+      id: 0,
+      period: "2024 — PRESENT",
+      role: "",
+      company: "",
+      company_url: "https://github.com/cipherWizard31",
+      tagline: "",
+      description: "",
+      skills: [],
+      display_order: experiencesList.length + 1,
+    };
+
+  const [experienceForm, setExperienceForm] = useState<ExperienceData>(selectedExperience);
+  const [newExpSkill, setNewExpSkill] = useState("");
+  const [isSavingExperience, setIsSavingExperience] = useState(false);
+
+  // Feedback Toast
   const [toast, setToast] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
 
-  // Handle switching selected project
+  // -------------------------------------------------------------
+  // EXPERIENCE HANDLERS
+  // -------------------------------------------------------------
+  const handleSelectExperience = (exp: ExperienceData) => {
+    setSelectedExperienceId(exp.id);
+    setExperienceForm(exp);
+    setToast(null);
+  };
+
+  const handleCreateNewExperience = () => {
+    const newExp: ExperienceData = {
+      id: 0,
+      period: "2024 — PRESENT",
+      role: "Backend Engineer",
+      company: "Tech Systems",
+      company_url: "https://github.com/cipherWizard31",
+      tagline: "High-Performance Systems & Distributed Architectures",
+      description:
+        "Spearheaded distributed backend services, asynchronous pipelines, and low-latency storage algorithms with zero downtime.",
+      skills: ["Go", "Distributed Systems", "gRPC", "Docker"],
+      display_order: experiencesList.length + 1,
+    };
+    setSelectedExperienceId(0);
+    setExperienceForm(newExp);
+    setToast({
+      type: "success",
+      text: "New experience role draft created. Fill in the details and click Save Experience.",
+    });
+  };
+
+  const handleAddExpSkill = () => {
+    if (!newExpSkill.trim()) return;
+    if (!experienceForm.skills.includes(newExpSkill.trim())) {
+      setExperienceForm((prev) => ({
+        ...prev,
+        skills: [...prev.skills, newExpSkill.trim()],
+      }));
+    }
+    setNewExpSkill("");
+  };
+
+  const handleRemoveExpSkill = (skillToRemove: string) => {
+    setExperienceForm((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((s) => s !== skillToRemove),
+    }));
+  };
+
+  const handleSaveExperience = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingExperience(true);
+    setToast(null);
+
+    try {
+      const res = await fetch("/api/cms/experiences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(experienceForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setToast({
+          type: "success",
+          text: "Experience role saved and synced to SQLite database!",
+        });
+
+        const refreshedRes = await fetch("/api/cms/experiences");
+        const refreshed = await refreshedRes.json();
+        if (refreshed.success) {
+          setExperiencesList(refreshed.data);
+          if (experienceForm.id === 0 && refreshed.data.length > 0) {
+            const newlyAdded = refreshed.data[refreshed.data.length - 1];
+            setSelectedExperienceId(newlyAdded.id);
+            setExperienceForm(newlyAdded);
+          }
+        }
+      } else {
+        setToast({ type: "error", text: data.error || "Failed to save experience." });
+      }
+    } catch (err) {
+      console.error(err);
+      setToast({ type: "error", text: "Server error saving experience." });
+    } finally {
+      setIsSavingExperience(false);
+    }
+  };
+
+  const handleDeleteExperience = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this experience role?")) return;
+    try {
+      const res = await fetch(`/api/cms/experiences?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        const updated = experiencesList.filter((e) => e.id !== id);
+        setExperiencesList(updated);
+        if (updated.length > 0) {
+          setSelectedExperienceId(updated[0].id);
+          setExperienceForm(updated[0]);
+        }
+        setToast({ type: "success", text: "Experience role deleted from database." });
+      }
+    } catch (err) {
+      console.error(err);
+      setToast({ type: "error", text: "Failed to delete experience." });
+    }
+  };
+
+  // -------------------------------------------------------------
+  // PROJECT HANDLERS
+  // -------------------------------------------------------------
   const handleSelectProject = (project: ProjectData) => {
     setSelectedProjectId(project.id);
     setProjectForm(project);
     setToast(null);
   };
 
-  // Create new project draft
   const handleCreateNewProject = () => {
     const newProj: ProjectData = {
-      id: 0, // 0 indicates new
+      id: 0,
       title: "New Distributed System",
       url: "https://github.com/cipherWizard31",
       description: "Brief architecture summary of the high-throughput engine...",
@@ -83,27 +218,24 @@ export default function CMSClient({
     });
   };
 
-  // Add tag to project
-  const handleAddTag = () => {
-    if (!newTagInput.trim()) return;
-    if (!projectForm.skills.includes(newTagInput.trim())) {
+  const handleAddProjectTag = () => {
+    if (!newProjectTag.trim()) return;
+    if (!projectForm.skills.includes(newProjectTag.trim())) {
       setProjectForm((prev) => ({
         ...prev,
-        skills: [...prev.skills, newTagInput.trim()],
+        skills: [...prev.skills, newProjectTag.trim()],
       }));
     }
-    setNewTagInput("");
+    setNewProjectTag("");
   };
 
-  // Remove tag
-  const handleRemoveTag = (tagToRemove: string) => {
+  const handleRemoveProjectTag = (tagToRemove: string) => {
     setProjectForm((prev) => ({
       ...prev,
       skills: prev.skills.filter((t) => t !== tagToRemove),
     }));
   };
 
-  // Image file upload with hash rename
   const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -140,7 +272,6 @@ export default function CMSClient({
     }
   };
 
-  // Save Project
   const handleSaveProject = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingProject(true);
@@ -159,7 +290,6 @@ export default function CMSClient({
           text: "Project saved and synced to SQLite database!",
         });
 
-        // Refresh project list
         const refreshedRes = await fetch("/api/cms/projects");
         const refreshed = await refreshedRes.json();
         if (refreshed.success) {
@@ -181,7 +311,6 @@ export default function CMSClient({
     }
   };
 
-  // Delete Project
   const handleDeleteProject = async (id: number) => {
     if (!confirm("Are you sure you want to delete this project?")) return;
     try {
@@ -204,7 +333,9 @@ export default function CMSClient({
     }
   };
 
-  // Save About
+  // -------------------------------------------------------------
+  // ABOUT HANDLERS
+  // -------------------------------------------------------------
   const handleSaveAbout = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingAbout(true);
@@ -233,9 +364,23 @@ export default function CMSClient({
     }
   };
 
+  const currentSaveHandler =
+    activeTab === "experience"
+      ? handleSaveExperience
+      : activeTab === "projects"
+      ? handleSaveProject
+      : handleSaveAbout;
+
+  const currentSaveLoading =
+    activeTab === "experience"
+      ? isSavingExperience
+      : activeTab === "projects"
+      ? isSavingProject
+      : isSavingAbout;
+
   return (
     <div className="min-h-screen bg-[#0b1326] text-[#dae2fd] font-sans antialiased flex flex-col selection:bg-[#5eead4] selection:text-[#00675b]">
-      {/* Top Header matching Stitch CMS design */}
+      {/* Top Header */}
       <header className="sticky top-0 z-50 h-16 border-b border-[#2d3449]/60 bg-[#060e20]/95 backdrop-blur-md px-6 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
@@ -264,17 +409,19 @@ export default function CMSClient({
           </Link>
 
           <button
-            onClick={activeTab === "projects" ? handleSaveProject : handleSaveAbout}
-            disabled={isSavingProject || isSavingAbout}
+            onClick={currentSaveHandler}
+            disabled={currentSaveLoading}
             type="button"
             className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#5eead4] hover:bg-[#b5fff0] text-[#00675b] text-xs font-mono font-semibold transition-all shadow-[0_0_16px_-4px_rgba(94,234,212,0.3)] active:scale-95 disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[16px]">
-              {isSavingProject || isSavingAbout ? "sync" : "cloud_upload"}
+              {currentSaveLoading ? "sync" : "cloud_upload"}
             </span>
             <span>
-              {isSavingProject || isSavingAbout
+              {currentSaveLoading
                 ? "Saving..."
+                : activeTab === "experience"
+                ? "Save Experience"
                 : activeTab === "projects"
                 ? "Save Project"
                 : "Save About"}
@@ -283,10 +430,27 @@ export default function CMSClient({
         </div>
       </header>
 
-      {/* Navigation Module Tabs matching Stitch CMS */}
+      {/* Navigation Module Tabs */}
       <div className="border-b border-[#2d3449]/60 bg-[#060e20]/60 px-6 py-2.5 sticky top-16 z-40 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 overflow-x-auto">
           <nav className="flex items-center gap-1.5">
+            {/* Experience Tab */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("experience");
+                setToast(null);
+              }}
+              className={`px-3.5 py-1.5 rounded-lg font-mono text-xs transition-all flex items-center gap-2 ${
+                activeTab === "experience"
+                  ? "bg-[#222a3d] text-[#5eead4] font-medium shadow-sm border border-[#5eead4]/30"
+                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]"
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">history_edu</span>
+              <span>Experience ({experiencesList.length})</span>
+            </button>
+
             {/* Projects Tab */}
             <button
               type="button"
@@ -321,15 +485,7 @@ export default function CMSClient({
               <span>About Section</span>
             </button>
 
-            {/* Inactive placeholders for next sections */}
-            <button
-              type="button"
-              disabled
-              className="px-3.5 py-1.5 rounded-lg font-mono text-xs flex items-center gap-2 text-[#94a3b8]/40 cursor-not-allowed"
-            >
-              <span className="material-symbols-outlined text-[16px]">history_edu</span>
-              <span>Experience (3)</span>
-            </button>
+            {/* Inactive placeholders */}
             <button
               type="button"
               disabled
@@ -358,14 +514,13 @@ export default function CMSClient({
 
           <div className="hidden md:flex items-center gap-2 text-xs font-mono text-[#94a3b8] pl-4 border-l border-[#2d3449]/40">
             <span className="text-[#5eead4]">●</span>
-            <span>Module: {activeTab === "projects" ? "Projects" : "About"}</span>
+            <span>Module: {activeTab.toUpperCase()}</span>
           </div>
         </div>
       </div>
 
-      {/* Main CMS Layout */}
+      {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8">
-        {/* Toast Alert */}
         {toast && (
           <div
             className={`mb-6 p-4 rounded-xl font-mono text-xs flex items-center justify-between border ${
@@ -386,10 +541,276 @@ export default function CMSClient({
           </div>
         )}
 
-        {/* PROJECTS TAB CONTENT */}
+        {/* ============================================================= */}
+        {/* EXPERIENCE MODULE TAB                                         */}
+        {/* ============================================================= */}
+        {activeTab === "experience" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Career Positions List */}
+            <div className="lg:col-span-5 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-semibold text-[#dae2fd]">Career Positions</h2>
+                  <span className="text-xs font-mono text-[#94a3b8]">{experiencesList.length} entries</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCreateNewExperience}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors border border-[#5eead4]/30"
+                >
+                  <span className="material-symbols-outlined text-[16px]">add</span>
+                  <span>+ New Role</span>
+                </button>
+              </div>
+
+              {/* Roles List */}
+              <div className="space-y-3">
+                {experiencesList.map((exp) => {
+                  const isSelected = selectedExperienceId === exp.id;
+                  return (
+                    <div
+                      key={exp.id}
+                      onClick={() => handleSelectExperience(exp)}
+                      className={`p-4 rounded-xl transition-all cursor-pointer border ${
+                        isSelected
+                          ? "bg-[#222a3d] border-[#5eead4]/40 shadow-[0_0_20px_-6px_rgba(94,234,212,0.15)]"
+                          : "bg-[#131b2e] border-[#2d3449]/40 hover:bg-[#171f33]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[#5eead4]/20 text-[#5eead4]">
+                          {exp.period}
+                        </span>
+                        <span className="text-xs font-mono text-[#94a3b8]">#{exp.id}</span>
+                      </div>
+
+                      <h4
+                        className={`text-sm font-semibold transition-colors ${
+                          isSelected ? "text-[#5eead4]" : "text-[#dae2fd]"
+                        }`}
+                      >
+                        {exp.role} · {exp.company}
+                      </h4>
+
+                      <p className="text-xs text-[#94a3b8] mt-0.5 font-mono">{exp.tagline}</p>
+
+                      <p className="text-xs text-[#bbcac5] mt-2 line-clamp-2 leading-relaxed">
+                        {exp.description}
+                      </p>
+
+                      <div className="flex items-center justify-between mt-3 text-xs font-mono text-[#94a3b8]">
+                        <div className="flex flex-wrap gap-1">
+                          {exp.skills.slice(0, 3).map((s) => (
+                            <span key={s} className="px-1.5 py-0.5 rounded bg-[#0b1326] text-[10px]">
+                              {s}
+                            </span>
+                          ))}
+                          {exp.skills.length > 3 && (
+                            <span className="text-[10px]">+{exp.skills.length - 3}</span>
+                          )}
+                        </div>
+
+                        {experiencesList.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteExperience(exp.id);
+                            }}
+                            className="text-red-400 hover:text-red-300 p-1"
+                            title="Delete role"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">
+                              delete
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right Column: Edit Form */}
+            <form
+              onSubmit={handleSaveExperience}
+              className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
+            >
+              <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
+                <div>
+                  <span className="text-xs font-mono text-[#94a3b8]">
+                    {experienceForm.id === 0 ? "NEW ROLE ENTRY" : `EXPERIENCE RECORD · #${experienceForm.id}`}
+                  </span>
+                  <h3 className="text-lg font-semibold text-[#dae2fd]">
+                    Edit: {experienceForm.role || "Untitled Position"}
+                  </h3>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const orig = experiencesList.find((e) => e.id === selectedExperienceId);
+                      if (orig) setExperienceForm(orig);
+                      setToast(null);
+                    }}
+                    className="px-3.5 py-1.5 rounded-lg border border-[#2d3449] hover:bg-[#171f33] text-xs font-mono text-[#dae2fd] transition-colors"
+                  >
+                    Discard
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingExperience}
+                    className="px-4 py-1.5 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-all disabled:opacity-50"
+                  >
+                    {isSavingExperience ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Role & Company */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Role Title
+                  </label>
+                  <input
+                    type="text"
+                    value={experienceForm.role}
+                    onChange={(e) =>
+                      setExperienceForm((prev) => ({ ...prev, role: e.target.value }))
+                    }
+                    required
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    value={experienceForm.company}
+                    onChange={(e) =>
+                      setExperienceForm((prev) => ({ ...prev, company: e.target.value }))
+                    }
+                    required
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Time Period & Tagline */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Time Period (e.g. 2024 — PRESENT)
+                  </label>
+                  <input
+                    type="text"
+                    value={experienceForm.period}
+                    onChange={(e) =>
+                      setExperienceForm((prev) => ({ ...prev, period: e.target.value }))
+                    }
+                    required
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Tagline Sub-Title
+                  </label>
+                  <input
+                    type="text"
+                    value={experienceForm.tagline}
+                    onChange={(e) =>
+                      setExperienceForm((prev) => ({ ...prev, tagline: e.target.value }))
+                    }
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                  Role Engineering Summary &amp; Key Achievements
+                </label>
+                <textarea
+                  rows={4}
+                  value={experienceForm.description}
+                  onChange={(e) =>
+                    setExperienceForm((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  required
+                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none resize-none leading-relaxed"
+                />
+              </div>
+
+              {/* Technologies Used */}
+              <div className="space-y-2">
+                <label className="text-xs font-mono text-[#94a3b8] uppercase block">
+                  Technologies Used &amp; Key Tools
+                </label>
+                <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-[#0b1326] border border-[#2d3449]">
+                  {experienceForm.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#222a3d] text-xs font-mono text-[#5eead4] border border-[#5eead4]/30"
+                    >
+                      <span>{skill}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveExpSkill(skill)}
+                        className="hover:text-red-400"
+                      >
+                        <span className="material-symbols-outlined text-[13px]">
+                          close
+                        </span>
+                      </button>
+                    </span>
+                  ))}
+
+                  <div className="inline-flex items-center gap-1">
+                    <input
+                      type="text"
+                      placeholder="Add tech..."
+                      value={newExpSkill}
+                      onChange={(e) => setNewExpSkill(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddExpSkill();
+                        }
+                      }}
+                      className="bg-transparent text-xs font-mono text-[#dae2fd] px-2 py-1 focus:outline-none w-24"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddExpSkill}
+                      className="text-xs font-mono text-[#5eead4] hover:underline"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* ============================================================= */}
+        {/* PROJECTS TAB CONTENT                                          */}
+        {/* ============================================================= */}
         {activeTab === "projects" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Projects List & Selector */}
+            {/* Left Column: Projects List */}
             <div className="lg:col-span-5 flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -406,7 +827,6 @@ export default function CMSClient({
                 </button>
               </div>
 
-              {/* Cards List */}
               <div className="space-y-3">
                 {projectsList.map((project) => {
                   const isSelected = selectedProjectId === project.id;
@@ -470,7 +890,7 @@ export default function CMSClient({
               </div>
             </div>
 
-            {/* Right Column: Edit Form for Selected Project */}
+            {/* Right Column: Edit Form */}
             <form
               onSubmit={handleSaveProject}
               className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
@@ -507,7 +927,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Title & URL */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-[#94a3b8] uppercase">
@@ -540,7 +959,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Description */}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase">
                   Architecture Description
@@ -559,7 +977,6 @@ export default function CMSClient({
                 />
               </div>
 
-              {/* Stars & Forks */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-[#94a3b8] uppercase">
@@ -590,7 +1007,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Technologies & Tags */}
               <div className="space-y-2">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase block">
                   Technologies &amp; Tags
@@ -604,7 +1020,7 @@ export default function CMSClient({
                       <span>{skill}</span>
                       <button
                         type="button"
-                        onClick={() => handleRemoveTag(skill)}
+                        onClick={() => handleRemoveProjectTag(skill)}
                         className="hover:text-red-400"
                       >
                         <span className="material-symbols-outlined text-[13px]">
@@ -618,19 +1034,19 @@ export default function CMSClient({
                     <input
                       type="text"
                       placeholder="Add tag..."
-                      value={newTagInput}
-                      onChange={(e) => setNewTagInput(e.target.value)}
+                      value={newProjectTag}
+                      onChange={(e) => setNewProjectTag(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
-                          handleAddTag();
+                          handleAddProjectTag();
                         }
                       }}
                       className="bg-transparent text-xs font-mono text-[#dae2fd] px-2 py-1 focus:outline-none w-24"
                     />
                     <button
                       type="button"
-                      onClick={handleAddTag}
+                      onClick={handleAddProjectTag}
                       className="text-xs font-mono text-[#5eead4] hover:underline"
                     >
                       + Add
@@ -639,7 +1055,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Project Image & Upload with Random Hash */}
               <div className="space-y-2 pt-2 border-t border-[#2d3449]/40">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase block">
                   Project Thumbnail Architecture Asset (Hashed Storage)
@@ -681,7 +1096,9 @@ export default function CMSClient({
           </div>
         )}
 
-        {/* ABOUT TAB CONTENT */}
+        {/* ============================================================= */}
+        {/* ABOUT TAB CONTENT                                             */}
+        {/* ============================================================= */}
         {activeTab === "about" && (
           <form
             onSubmit={handleSaveAbout}
@@ -783,7 +1200,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Paragraph 1 */}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase tracking-wide">
                   Paragraph 1: Background &amp; Origins
@@ -799,7 +1215,6 @@ export default function CMSClient({
                 />
               </div>
 
-              {/* Paragraph 2 */}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase tracking-wide">
                   Paragraph 2: Engineering Philosophy &amp; Tooling
@@ -815,7 +1230,6 @@ export default function CMSClient({
                 />
               </div>
 
-              {/* Paragraph 3 */}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase tracking-wide">
                   Paragraph 3: Current Research &amp; Interests
@@ -831,7 +1245,6 @@ export default function CMSClient({
                 />
               </div>
 
-              {/* Telemetry Architecture Node Specs */}
               <div className="pt-2 border-t border-[#2d3449]/40 space-y-4">
                 <span className="font-mono text-xs uppercase tracking-wider text-[#5eead4] font-medium block">
                   Telemetry Widget Metric Controls
