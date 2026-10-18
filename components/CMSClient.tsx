@@ -8,6 +8,9 @@ import type {
   ProjectData,
   ExperienceData,
   CertificationData,
+  SkillCategoryData,
+  ArticleData,
+  PhilosophyData,
 } from "@/lib/portfolio";
 
 interface CMSClientProps {
@@ -15,6 +18,9 @@ interface CMSClientProps {
   initialProjects: ProjectData[];
   initialExperiences: ExperienceData[];
   initialCertifications: CertificationData[];
+  initialSkillCategories: SkillCategoryData[];
+  initialArticles: ArticleData[];
+  initialPhilosophy: PhilosophyData;
 }
 
 export default function CMSClient({
@@ -22,11 +28,14 @@ export default function CMSClient({
   initialProjects,
   initialExperiences,
   initialCertifications,
+  initialSkillCategories,
+  initialArticles,
+  initialPhilosophy,
 }: CMSClientProps) {
   // Navigation tab state
   const [activeTab, setActiveTab] = useState<
-    "certifications" | "projects" | "experience" | "about"
-  >("certifications");
+    "skills" | "philosophy" | "certifications" | "experience" | "projects" | "about"
+  >("skills");
 
   // About form state
   const [aboutData, setAboutData] = useState<AboutData>(initialAbout);
@@ -112,11 +121,214 @@ export default function CMSClient({
   const [newCertSkill, setNewCertSkill] = useState("");
   const [isSavingCert, setIsSavingCert] = useState(false);
 
-  // Feedback Toast
+  // Skills & Technical Arsenal state
+  const [skillCategoriesList, setSkillCategoriesList] = useState<SkillCategoryData[]>(initialSkillCategories);
+  const [newCategoryTitle, setNewCategoryTitle] = useState("");
+  const [newSkillInputs, setNewSkillInputs] = useState<Record<number, string>>({});
+  const [isSavingSkills, setIsSavingSkills] = useState(false);
+
+  // Articles state
+  const [articlesList, setArticlesList] = useState<ArticleData[]>(initialArticles);
+  const [newArticleForm, setNewArticleForm] = useState<Partial<ArticleData>>({
+    title: "",
+    publication: "Substack / Distributed Musings",
+    url: "https://cipherwizard.substack.com",
+    year: "2026",
+    read_time: "7 min read",
+  });
+  const [isSavingArticles, setIsSavingArticles] = useState(false);
+
+  // Philosophy state
+  const [philosophyForm, setPhilosophyForm] = useState<PhilosophyData>(initialPhilosophy);
+  const [isSavingPhilosophy, setIsSavingPhilosophy] = useState(false);
+
+  // Toast
   const [toast, setToast] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
+
+  // -------------------------------------------------------------
+  // SKILLS & TECHNICAL ARSENAL HANDLERS
+  // -------------------------------------------------------------
+  const handleAddCategory = async () => {
+    if (!newCategoryTitle.trim()) return;
+    try {
+      const res = await fetch("/api/cms/skills", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newCategoryTitle.trim(),
+          skills: [],
+          display_order: skillCategoriesList.length + 1,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNewCategoryTitle("");
+        const refreshed = await (await fetch("/api/cms/skills")).json();
+        if (refreshed.success) setSkillCategoriesList(refreshed.data);
+        setToast({ type: "success", text: "New skill category created." });
+      }
+    } catch {
+      setToast({ type: "error", text: "Failed to create category." });
+    }
+  };
+
+  const handleAddSkillToCat = async (categoryId: number) => {
+    const skillName = (newSkillInputs[categoryId] || "").trim();
+    if (!skillName) return;
+
+    const cat = skillCategoriesList.find((c) => c.id === categoryId);
+    if (!cat) return;
+
+    const updatedSkills = [...cat.skills, skillName];
+    try {
+      const res = await fetch("/api/cms/skills", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...cat,
+          skills: updatedSkills,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSkillCategoriesList((prev) =>
+          prev.map((c) => (c.id === categoryId ? { ...c, skills: updatedSkills } : c))
+        );
+        setNewSkillInputs((prev) => ({ ...prev, [categoryId]: "" }));
+        setToast({ type: "success", text: `Added "${skillName}" to ${cat.title}` });
+      }
+    } catch {
+      setToast({ type: "error", text: "Failed to add skill." });
+    }
+  };
+
+  const handleRemoveSkillFromCat = async (categoryId: number, skillName: string) => {
+    const cat = skillCategoriesList.find((c) => c.id === categoryId);
+    if (!cat) return;
+
+    const updatedSkills = cat.skills.filter((s) => s !== skillName);
+    try {
+      const res = await fetch("/api/cms/skills", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...cat,
+          skills: updatedSkills,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSkillCategoriesList((prev) =>
+          prev.map((c) => (c.id === categoryId ? { ...c, skills: updatedSkills } : c))
+        );
+        setToast({ type: "success", text: `Removed "${skillName}"` });
+      }
+    } catch {
+      setToast({ type: "error", text: "Failed to remove skill." });
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId: number) => {
+    if (!confirm("Are you sure you want to delete this category?")) return;
+    try {
+      const res = await fetch(`/api/cms/skills?id=${categoryId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSkillCategoriesList((prev) => prev.filter((c) => c.id !== categoryId));
+        setToast({ type: "success", text: "Skill category deleted." });
+      }
+    } catch {
+      setToast({ type: "error", text: "Failed to delete category." });
+    }
+  };
+
+  // -------------------------------------------------------------
+  // WRITING & ARTICLES HANDLERS
+  // -------------------------------------------------------------
+  const handleSaveNewArticle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newArticleForm.title?.trim()) return;
+
+    setIsSavingArticles(true);
+    try {
+      const res = await fetch("/api/cms/articles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...newArticleForm,
+          display_order: articlesList.length + 1,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const refreshed = await (await fetch("/api/cms/articles")).json();
+        if (refreshed.success) setArticlesList(refreshed.data);
+        setNewArticleForm({
+          title: "",
+          publication: "Substack / Distributed Musings",
+          url: "https://cipherwizard.substack.com",
+          year: `${new Date().getFullYear()}`,
+          read_time: "7 min read",
+        });
+        setToast({ type: "success", text: "Article publication added!" });
+      }
+    } catch {
+      setToast({ type: "error", text: "Failed to save article." });
+    } finally {
+      setIsSavingArticles(false);
+    }
+  };
+
+  const handleDeleteArticle = async (id: number) => {
+    if (!confirm("Delete this article entry?")) return;
+    try {
+      const res = await fetch(`/api/cms/articles?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setArticlesList((prev) => prev.filter((a) => a.id !== id));
+        setToast({ type: "success", text: "Article removed." });
+      }
+    } catch {
+      setToast({ type: "error", text: "Failed to delete article." });
+    }
+  };
+
+  // -------------------------------------------------------------
+  // PHILOSOPHY & PARAGRAPH HANDLERS
+  // -------------------------------------------------------------
+  const handleSavePhilosophy = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingPhilosophy(true);
+    setToast(null);
+
+    try {
+      const res = await fetch("/api/cms/philosophy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(philosophyForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setToast({
+          type: "success",
+          text: "Philosophy principles & colophon saved to SQLite!",
+        });
+      } else {
+        setToast({ type: "error", text: data.error || "Failed to save philosophy." });
+      }
+    } catch {
+      setToast({ type: "error", text: "Server error saving philosophy." });
+    } finally {
+      setIsSavingPhilosophy(false);
+    }
+  };
 
   // -------------------------------------------------------------
   // CERTIFICATIONS HANDLERS
@@ -204,8 +416,7 @@ export default function CMSClient({
       } else {
         setToast({ type: "error", text: data.error || "Failed to save certification." });
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setToast({ type: "error", text: "Server error saving certification." });
     } finally {
       setIsSavingCert(false);
@@ -228,8 +439,7 @@ export default function CMSClient({
         }
         setToast({ type: "success", text: "Certification deleted from database." });
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setToast({ type: "error", text: "Failed to delete certification." });
     }
   };
@@ -260,7 +470,7 @@ export default function CMSClient({
     setExperienceForm(newExp);
     setToast({
       type: "success",
-      text: "New experience role draft created. Fill in the details and click Save Experience.",
+      text: "New experience role draft created.",
     });
   };
 
@@ -297,11 +507,10 @@ export default function CMSClient({
       if (data.success) {
         setToast({
           type: "success",
-          text: "Experience role saved and synced to SQLite database!",
+          text: "Experience role saved and synced to SQLite!",
         });
 
-        const refreshedRes = await fetch("/api/cms/experiences");
-        const refreshed = await refreshedRes.json();
+        const refreshed = await (await fetch("/api/cms/experiences")).json();
         if (refreshed.success) {
           setExperiencesList(refreshed.data);
           if (experienceForm.id === 0 && refreshed.data.length > 0) {
@@ -310,11 +519,8 @@ export default function CMSClient({
             setExperienceForm(newlyAdded);
           }
         }
-      } else {
-        setToast({ type: "error", text: data.error || "Failed to save experience." });
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setToast({ type: "error", text: "Server error saving experience." });
     } finally {
       setIsSavingExperience(false);
@@ -322,24 +528,18 @@ export default function CMSClient({
   };
 
   const handleDeleteExperience = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this experience role?")) return;
+    if (!confirm("Are you sure you want to delete this role?")) return;
     try {
       const res = await fetch(`/api/cms/experiences?id=${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
       if (data.success) {
-        const updated = experiencesList.filter((e) => e.id !== id);
-        setExperiencesList(updated);
-        if (updated.length > 0) {
-          setSelectedExperienceId(updated[0].id);
-          setExperienceForm(updated[0]);
-        }
-        setToast({ type: "success", text: "Experience role deleted from database." });
+        setExperiencesList((prev) => prev.filter((e) => e.id !== id));
+        setToast({ type: "success", text: "Role deleted." });
       }
-    } catch (err) {
-      console.error(err);
-      setToast({ type: "error", text: "Failed to delete experience." });
+    } catch {
+      setToast({ type: "error", text: "Failed to delete role." });
     }
   };
 
@@ -369,7 +569,7 @@ export default function CMSClient({
     setProjectForm(newProj);
     setToast({
       type: "success",
-      text: "New project draft initialized. Fill in details and click Save Project.",
+      text: "New project draft initialized.",
     });
   };
 
@@ -416,12 +616,9 @@ export default function CMSClient({
           type: "success",
           text: `Image uploaded with hash name: ${data.fileName}`,
         });
-      } else {
-        setToast({ type: "error", text: data.error || "Image upload failed." });
       }
-    } catch (err) {
-      console.error(err);
-      setToast({ type: "error", text: "Network error uploading image." });
+    } catch {
+      setToast({ type: "error", text: "Error uploading image." });
     } finally {
       setIsUploadingImage(false);
     }
@@ -444,22 +641,12 @@ export default function CMSClient({
           type: "success",
           text: "Project saved and synced to SQLite database!",
         });
-
-        const refreshedRes = await fetch("/api/cms/projects");
-        const refreshed = await refreshedRes.json();
+        const refreshed = await (await fetch("/api/cms/projects")).json();
         if (refreshed.success) {
           setProjectsList(refreshed.data);
-          if (projectForm.id === 0 && refreshed.data.length > 0) {
-            const newlyAdded = refreshed.data[refreshed.data.length - 1];
-            setSelectedProjectId(newlyAdded.id);
-            setProjectForm(newlyAdded);
-          }
         }
-      } else {
-        setToast({ type: "error", text: data.error || "Failed to save project." });
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setToast({ type: "error", text: "Server error saving project." });
     } finally {
       setIsSavingProject(false);
@@ -467,29 +654,23 @@ export default function CMSClient({
   };
 
   const handleDeleteProject = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this project?")) return;
+    if (!confirm("Delete this project?")) return;
     try {
       const res = await fetch(`/api/cms/projects?id=${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
       if (data.success) {
-        const updated = projectsList.filter((p) => p.id !== id);
-        setProjectsList(updated);
-        if (updated.length > 0) {
-          setSelectedProjectId(updated[0].id);
-          setProjectForm(updated[0]);
-        }
-        setToast({ type: "success", text: "Project deleted from database." });
+        setProjectsList((prev) => prev.filter((p) => p.id !== id));
+        setToast({ type: "success", text: "Project deleted." });
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setToast({ type: "error", text: "Failed to delete project." });
     }
   };
 
   // -------------------------------------------------------------
-  // ABOUT HANDLERS
+  // ABOUT HANDLER
   // -------------------------------------------------------------
   const handleSaveAbout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -506,21 +687,23 @@ export default function CMSClient({
       if (data.success) {
         setToast({
           type: "success",
-          text: "About section & telemetry saved to SQLite database!",
+          text: "About section & telemetry saved to SQLite!",
         });
-      } else {
-        setToast({ type: "error", text: data.error || "Failed to save About." });
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setToast({ type: "error", text: "Server error saving About section." });
     } finally {
       setIsSavingAbout(false);
     }
   };
 
+  // Determine active save handler
   const currentSaveHandler =
-    activeTab === "certifications"
+    activeTab === "skills"
+      ? (e: any) => e.preventDefault()
+      : activeTab === "philosophy"
+      ? handleSavePhilosophy
+      : activeTab === "certifications"
       ? handleSaveCert
       : activeTab === "experience"
       ? handleSaveExperience
@@ -529,7 +712,9 @@ export default function CMSClient({
       : handleSaveAbout;
 
   const currentSaveLoading =
-    activeTab === "certifications"
+    activeTab === "philosophy"
+      ? isSavingPhilosophy
+      : activeTab === "certifications"
       ? isSavingCert
       : activeTab === "experience"
       ? isSavingExperience
@@ -540,61 +725,91 @@ export default function CMSClient({
   return (
     <div className="min-h-screen bg-[#0b1326] text-[#dae2fd] font-sans antialiased flex flex-col selection:bg-[#5eead4] selection:text-[#00675b]">
       {/* Top Header */}
-      <header className="sticky top-0 z-50 h-16 border-b border-[#2d3449]/60 bg-[#060e20]/95 backdrop-blur-md px-6 flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#5eead4] animate-pulse shadow-[0_0_10px_#5eead4]" />
-            <span className="font-mono text-sm tracking-wide font-medium text-[#dae2fd]">
-              NATAN YIDNKEACHEW{" "}
+      <header className="sticky top-0 z-50 h-16 border-b border-[#2d3449]/60 bg-[#060e20]/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4 sm:gap-6 min-w-0">
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#5eead4] animate-pulse shadow-[0_0_12px_#5eead4]" />
+            <span className="font-mono text-xs sm:text-sm tracking-wide font-medium text-[#dae2fd] whitespace-nowrap">
+              NATAN YIDNEKACHEW{" "}
               <span className="text-[#5eead4] font-semibold">//</span> CMS STUDIO
             </span>
           </div>
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#131b2e] border border-[#2d3449]/40">
-            <span className="w-2 h-2 rounded-full bg-[#5eead4]" />
-            <span className="font-mono text-xs text-[#bbcac5]">
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-[#131b2e] border border-[#2d3449]/60 shrink-0 shadow-inner">
+            <span className="w-2 h-2 rounded-full bg-[#5eead4] shadow-[0_0_6px_#5eead4]" />
+            <span className="font-mono text-[11px] text-[#bbcac5] whitespace-nowrap">
               Sync: <span className="text-[#5eead4] font-medium">SQLite Live</span>
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <Link
             href="/"
             target="_blank"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-[#94a3b8] hover:text-[#dae2fd] hover:bg-[#131b2e] transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono text-[#94a3b8] hover:text-[#dae2fd] hover:bg-[#131b2e] border border-transparent hover:border-[#2d3449]/60 transition-all whitespace-nowrap"
           >
             <span>View Live Site</span>
             <span className="material-symbols-outlined text-[15px]">north_east</span>
           </Link>
 
-          <button
-            onClick={currentSaveHandler}
-            disabled={currentSaveLoading}
-            type="button"
-            className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#5eead4] hover:bg-[#b5fff0] text-[#00675b] text-xs font-mono font-semibold transition-all shadow-[0_0_16px_-4px_rgba(94,234,212,0.3)] active:scale-95 disabled:opacity-50"
-          >
-            <span className="material-symbols-outlined text-[16px]">
-              {currentSaveLoading ? "sync" : "cloud_upload"}
-            </span>
-            <span>
-              {currentSaveLoading
-                ? "Saving..."
-                : activeTab === "certifications"
-                ? "Save Credential"
-                : activeTab === "experience"
-                ? "Save Experience"
-                : activeTab === "projects"
-                ? "Save Project"
-                : "Save About"}
-            </span>
-          </button>
+          {activeTab !== "skills" && (
+            <button
+              onClick={currentSaveHandler}
+              disabled={currentSaveLoading}
+              type="button"
+              className="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-[#5eead4] hover:bg-[#b5fff0] text-[#00675b] text-xs font-mono font-semibold transition-all shadow-[0_0_18px_-4px_rgba(94,234,212,0.35)] active:scale-95 disabled:opacity-50 whitespace-nowrap"
+            >
+              <span className="material-symbols-outlined text-[16px]">
+                {currentSaveLoading ? "sync" : "cloud_upload"}
+              </span>
+              <span>
+                {currentSaveLoading
+                  ? "Saving..."
+                  : `Save ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`}
+              </span>
+            </button>
+          )}
         </div>
       </header>
 
       {/* Navigation Module Tabs */}
-      <div className="border-b border-[#2d3449]/60 bg-[#060e20]/60 px-6 py-2.5 sticky top-16 z-40 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 overflow-x-auto">
-          <nav className="flex items-center gap-1.5">
+      <div className="border-b border-[#2d3449]/60 bg-[#060e20]/80 px-4 sm:px-6 py-2.5 sticky top-16 z-40 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <nav className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 w-full md:w-auto">
+            {/* Technical Arsenal & Writing Tab */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("skills");
+                setToast(null);
+              }}
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
+                activeTab === "skills"
+                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px] shrink-0">memory</span>
+              <span className="whitespace-nowrap">Technical Arsenal &amp; Writing</span>
+            </button>
+
+            {/* Philosophy Tab */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("philosophy");
+                setToast(null);
+              }}
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
+                activeTab === "philosophy"
+                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px] shrink-0">psychology</span>
+              <span className="whitespace-nowrap">Philosophy &amp; Words</span>
+            </button>
+
             {/* Certifications Tab */}
             <button
               type="button"
@@ -602,14 +817,14 @@ export default function CMSClient({
                 setActiveTab("certifications");
                 setToast(null);
               }}
-              className={`px-3.5 py-1.5 rounded-lg font-mono text-xs transition-all flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
                 activeTab === "certifications"
-                  ? "bg-[#222a3d] text-[#5eead4] font-medium shadow-sm border border-[#5eead4]/30"
-                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]"
+                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
               }`}
             >
-              <span className="material-symbols-outlined text-[16px]">verified</span>
-              <span>Certifications ({certificationsList.length})</span>
+              <span className="material-symbols-outlined text-[16px] shrink-0">verified</span>
+              <span className="whitespace-nowrap">Certifications ({certificationsList.length})</span>
             </button>
 
             {/* Experience Tab */}
@@ -619,14 +834,14 @@ export default function CMSClient({
                 setActiveTab("experience");
                 setToast(null);
               }}
-              className={`px-3.5 py-1.5 rounded-lg font-mono text-xs transition-all flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
                 activeTab === "experience"
-                  ? "bg-[#222a3d] text-[#5eead4] font-medium shadow-sm border border-[#5eead4]/30"
-                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]"
+                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
               }`}
             >
-              <span className="material-symbols-outlined text-[16px]">history_edu</span>
-              <span>Experience ({experiencesList.length})</span>
+              <span className="material-symbols-outlined text-[16px] shrink-0">history_edu</span>
+              <span className="whitespace-nowrap">Experience ({experiencesList.length})</span>
             </button>
 
             {/* Projects Tab */}
@@ -636,14 +851,14 @@ export default function CMSClient({
                 setActiveTab("projects");
                 setToast(null);
               }}
-              className={`px-3.5 py-1.5 rounded-lg font-mono text-xs transition-all flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
                 activeTab === "projects"
-                  ? "bg-[#222a3d] text-[#5eead4] font-medium shadow-sm border border-[#5eead4]/30"
-                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]"
+                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
               }`}
             >
-              <span className="material-symbols-outlined text-[16px]">terminal</span>
-              <span>Projects ({projectsList.length})</span>
+              <span className="material-symbols-outlined text-[16px] shrink-0">terminal</span>
+              <span className="whitespace-nowrap">Projects ({projectsList.length})</span>
             </button>
 
             {/* About Tab */}
@@ -653,38 +868,20 @@ export default function CMSClient({
                 setActiveTab("about");
                 setToast(null);
               }}
-              className={`px-3.5 py-1.5 rounded-lg font-mono text-xs transition-all flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
                 activeTab === "about"
-                  ? "bg-[#222a3d] text-[#5eead4] font-medium shadow-sm border border-[#5eead4]/30"
-                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]"
+                  ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
               }`}
             >
-              <span className="material-symbols-outlined text-[16px]">badge</span>
-              <span>About Section</span>
-            </button>
-
-            {/* Inactive placeholders */}
-            <button
-              type="button"
-              disabled
-              className="px-3.5 py-1.5 rounded-lg font-mono text-xs flex items-center gap-2 text-[#94a3b8]/40 cursor-not-allowed"
-            >
-              <span className="material-symbols-outlined text-[16px]">memory</span>
-              <span>Skills &amp; Writing</span>
-            </button>
-            <button
-              type="button"
-              disabled
-              className="px-3.5 py-1.5 rounded-lg font-mono text-xs flex items-center gap-2 text-[#94a3b8]/40 cursor-not-allowed"
-            >
-              <span className="material-symbols-outlined text-[16px]">psychology</span>
-              <span>Philosophy</span>
+              <span className="material-symbols-outlined text-[16px] shrink-0">badge</span>
+              <span className="whitespace-nowrap">About Section</span>
             </button>
           </nav>
 
-          <div className="hidden md:flex items-center gap-2 text-xs font-mono text-[#94a3b8] pl-4 border-l border-[#2d3449]/40">
+          <div className="hidden lg:flex items-center gap-2 text-xs font-mono text-[#94a3b8] pl-4 border-l border-[#2d3449]/40 shrink-0">
             <span className="text-[#5eead4]">●</span>
-            <span>Module: {activeTab.toUpperCase()}</span>
+            <span className="whitespace-nowrap">Module: {activeTab.toUpperCase()}</span>
           </div>
         </div>
       </div>
@@ -712,11 +909,377 @@ export default function CMSClient({
         )}
 
         {/* ============================================================= */}
+        {/* TECHNICAL ARSENAL & WRITING MODULE TAB                        */}
+        {/* ============================================================= */}
+        {activeTab === "skills" && (
+          <div className="space-y-10">
+            {/* Top Toolbar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#2d3449]/50">
+              <div>
+                <h2 className="text-xl font-semibold text-[#dae2fd] flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[#5eead4] text-[22px]">terminal</span>
+                  <span>Technical Arsenal &amp; Skill Matrix</span>
+                </h2>
+                <p className="text-xs font-mono text-[#94a3b8] mt-1">
+                  Categorized skills taxonomy displayed on your public portfolio.
+                </p>
+              </div>
+
+              {/* Add New Category Form */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="New category name..."
+                  value={newCategoryTitle}
+                  onChange={(e) => setNewCategoryTitle(e.target.value)}
+                  className="px-3 py-1.5 rounded-lg bg-[#131b2e] border border-[#2d3449] text-xs font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCategory}
+                  className="px-3.5 py-1.5 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors border border-[#5eead4]/30"
+                >
+                  + Add Category
+                </button>
+              </div>
+            </div>
+
+            {/* Categories Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+              {skillCategoriesList.map((category) => (
+                <div
+                  key={category.id}
+                  className="p-6 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-lg space-y-4"
+                >
+                  <div className="flex items-center justify-between border-b border-[#2d3449]/40 pb-3">
+                    <div>
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#94a3b8]">
+                        CATEGORY #{category.id}
+                      </span>
+                      <h3 className="text-base font-semibold text-[#5eead4]">
+                        {category.title}
+                      </h3>
+                    </div>
+                    {skillCategoriesList.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCategory(category.id)}
+                        className="text-red-400 hover:text-red-300 p-1"
+                        title="Delete category"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Skills Pills */}
+                  <div className="flex flex-wrap gap-2 min-h-[50px] p-3 rounded-xl bg-[#0b1326] border border-[#2d3449]">
+                    {category.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#222a3d] text-xs font-mono text-[#dae2fd] border border-[#2d3449]"
+                      >
+                        <span>{skill}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSkillFromCat(category.id, skill)}
+                          className="hover:text-red-400"
+                        >
+                          <span className="material-symbols-outlined text-[13px]">close</span>
+                        </button>
+                      </span>
+                    ))}
+
+                    {/* Add Skill to this category */}
+                    <div className="inline-flex items-center gap-1">
+                      <input
+                        type="text"
+                        placeholder="Add skill..."
+                        value={newSkillInputs[category.id] || ""}
+                        onChange={(e) =>
+                          setNewSkillInputs((prev) => ({
+                            ...prev,
+                            [category.id]: e.target.value,
+                          }))
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddSkillToCat(category.id);
+                          }
+                        }}
+                        className="bg-transparent text-xs font-mono text-[#5eead4] px-2 py-1 focus:outline-none w-24"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleAddSkillToCat(category.id)}
+                        className="text-xs font-mono text-[#5eead4] hover:underline"
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Technical Writing & Publications Studio */}
+            <div className="pt-8 border-t border-[#2d3449]/50 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#dae2fd] flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[#5eead4] text-[20px]">article</span>
+                    <span>Technical Writing &amp; Substack Publications</span>
+                  </h3>
+                  <p className="text-xs font-mono text-[#94a3b8] mt-0.5">
+                    Manage articles and essays linked to your Substack.
+                  </p>
+                </div>
+              </div>
+
+              {/* Add New Article Form */}
+              <form
+                onSubmit={handleSaveNewArticle}
+                className="p-5 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 grid grid-cols-1 md:grid-cols-12 gap-4 items-end"
+              >
+                <div className="md:col-span-5 space-y-1">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">Article Title</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Mechanical Sympathy and Zero-Copy Serialization"
+                    value={newArticleForm.title || ""}
+                    onChange={(e) => setNewArticleForm((prev) => ({ ...prev, title: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+
+                <div className="md:col-span-3 space-y-1">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">Publication / Channel</label>
+                  <input
+                    type="text"
+                    required
+                    value={newArticleForm.publication || ""}
+                    onChange={(e) =>
+                      setNewArticleForm((prev) => ({ ...prev, publication: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+
+                <div className="md:col-span-2 space-y-1">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">Read Time</label>
+                  <input
+                    type="text"
+                    required
+                    value={newArticleForm.read_time || ""}
+                    onChange={(e) =>
+                      setNewArticleForm((prev) => ({ ...prev, read_time: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <button
+                    type="submit"
+                    disabled={isSavingArticles}
+                    className="w-full py-2 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-colors"
+                  >
+                    + Add Article
+                  </button>
+                </div>
+              </form>
+
+              {/* Articles List */}
+              <div className="space-y-3">
+                {articlesList.map((art) => (
+                  <div
+                    key={art.id}
+                    className="p-4 rounded-xl bg-[#131b2e] border border-[#2d3449]/50 flex items-center justify-between gap-4"
+                  >
+                    <div>
+                      <h4 className="text-sm font-medium text-[#dae2fd]">{art.title}</h4>
+                      <p className="text-xs font-mono text-[#94a3b8] mt-1 flex items-center gap-2">
+                        <span>{art.publication}</span>
+                        <span>•</span>
+                        <span>{art.read_time}</span>
+                        <span>•</span>
+                        <span>{art.year}</span>
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={art.url}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="px-2.5 py-1 rounded bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4]"
+                      >
+                        Visit ↗
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteArticle(art.id)}
+                        className="text-red-400 hover:text-red-300 p-1"
+                        title="Delete article"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ============================================================= */}
+        {/* PHILOSOPHY MODULE TAB                                         */}
+        {/* ============================================================= */}
+        {activeTab === "philosophy" && (
+          <form
+            onSubmit={handleSavePhilosophy}
+            className="max-w-4xl mx-auto p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
+          >
+            <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
+              <div>
+                <span className="text-xs font-mono text-[#94a3b8]">EDITORIAL PRINCIPLES</span>
+                <h3 className="text-lg font-semibold text-[#dae2fd]">
+                  Beyond the Code / Philosophy Studio
+                </h3>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSavingPhilosophy}
+                className="px-4 py-1.5 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-all disabled:opacity-50"
+              >
+                {isSavingPhilosophy ? "Saving..." : "Update Principle"}
+              </button>
+            </div>
+
+            {/* Principle Tag & Title */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                  Principle Tag Header
+                </label>
+                <input
+                  type="text"
+                  value={philosophyForm.principle_tag}
+                  onChange={(e) =>
+                    setPhilosophyForm((prev) => ({
+                      ...prev,
+                      principle_tag: e.target.value,
+                    }))
+                  }
+                  required
+                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#5eead4] focus:border-[#5eead4] focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                  Section Title
+                </label>
+                <input
+                  type="text"
+                  value={philosophyForm.title}
+                  onChange={(e) =>
+                    setPhilosophyForm((prev) => ({
+                      ...prev,
+                      title: e.target.value,
+                    }))
+                  }
+                  required
+                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Paragraph 1 */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                Paragraph 1 (The Role of Engineers in the AI Era)
+              </label>
+              <textarea
+                rows={4}
+                value={philosophyForm.paragraph1}
+                onChange={(e) =>
+                  setPhilosophyForm((prev) => ({
+                    ...prev,
+                    paragraph1: e.target.value,
+                  }))
+                }
+                required
+                className="w-full px-4 py-3 rounded-xl bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none resize-none leading-relaxed"
+              />
+            </div>
+
+            {/* Paragraph 2 */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                Paragraph 2 (Engineering Judgment &amp; Dependability)
+              </label>
+              <textarea
+                rows={4}
+                value={philosophyForm.paragraph2}
+                onChange={(e) =>
+                  setPhilosophyForm((prev) => ({
+                    ...prev,
+                    paragraph2: e.target.value,
+                  }))
+                }
+                required
+                className="w-full px-4 py-3 rounded-xl bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none resize-none leading-relaxed"
+              />
+            </div>
+
+            {/* Colophon & Copyright */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#2d3449]/40">
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                  Colophon Stack Text
+                </label>
+                <input
+                  type="text"
+                  value={philosophyForm.footer_text}
+                  onChange={(e) =>
+                    setPhilosophyForm((prev) => ({
+                      ...prev,
+                      footer_text: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-xs font-mono text-[#94a3b8] focus:border-[#5eead4] focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                  Copyright Notice
+                </label>
+                <input
+                  type="text"
+                  value={philosophyForm.copyright}
+                  onChange={(e) =>
+                    setPhilosophyForm((prev) => ({
+                      ...prev,
+                      copyright: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-xs font-mono text-[#94a3b8] focus:border-[#5eead4] focus:outline-none"
+                />
+              </div>
+            </div>
+          </form>
+        )}
+
+        {/* ============================================================= */}
         {/* CERTIFICATIONS MODULE TAB                                     */}
         {/* ============================================================= */}
         {activeTab === "certifications" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Credentials List */}
             <div className="lg:col-span-5 flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -733,7 +1296,6 @@ export default function CMSClient({
                 </button>
               </div>
 
-              {/* Cards List matching Stitch Design */}
               <div className="space-y-3">
                 {certificationsList.map((cert) => {
                   const isSelected = selectedCertId === cert.id;
@@ -793,7 +1355,6 @@ export default function CMSClient({
               </div>
             </div>
 
-            {/* Right Column: Edit Form */}
             <form
               onSubmit={handleSaveCert}
               className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
@@ -830,7 +1391,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Title & Issuer */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-[#94a3b8] uppercase">
@@ -863,7 +1423,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Code, Year, Category */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-[#94a3b8] uppercase">
@@ -910,7 +1469,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Domain Track, Validity, Icon */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-[#94a3b8] uppercase">
@@ -955,7 +1513,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Verification Link */}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase">
                   Official Registry Verification Link
@@ -981,7 +1538,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Lightbox Description */}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase">
                   Lightbox Verification Description
@@ -1000,7 +1556,6 @@ export default function CMSClient({
                 />
               </div>
 
-              {/* Verified Competencies */}
               <div className="space-y-2">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase block">
                   Verified Competencies &amp; Syllabi
@@ -1212,7 +1767,7 @@ export default function CMSClient({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-[#94a3b8] uppercase">
-                    Time Period (e.g. 2024 — PRESENT)
+                    Time Period
                   </label>
                   <input
                     type="text"
@@ -1310,7 +1865,7 @@ export default function CMSClient({
         )}
 
         {/* ============================================================= */}
-        {/* PROJECTS TAB CONTENT                                          */}
+        {/* PROJECTS MODULE TAB                                           */}
         {/* ============================================================= */}
         {activeTab === "projects" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -1599,7 +2154,7 @@ export default function CMSClient({
         )}
 
         {/* ============================================================= */}
-        {/* ABOUT TAB CONTENT                                             */}
+        {/* ABOUT MODULE TAB                                              */}
         {/* ============================================================= */}
         {activeTab === "about" && (
           <form

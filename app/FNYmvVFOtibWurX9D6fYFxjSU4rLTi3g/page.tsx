@@ -18,6 +18,9 @@ export default function CMSPage() {
       initialProjects={data.projects}
       initialExperiences={data.experiences}
       initialCertifications={data.certifications}
+      initialSkillCategories={data.skillCategories}
+      initialArticles={data.articles}
+      initialPhilosophy={data.philosophy}
     />
   );
 }
