@@ -17,6 +17,7 @@ export default function CMSPage() {
       initialAbout={data.about}
       initialProjects={data.projects}
       initialExperiences={data.experiences}
+      initialCertifications={data.certifications}
     />
   );
 }

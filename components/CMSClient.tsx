@@ -3,21 +3,30 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { AboutData, ProjectData, ExperienceData } from "@/lib/portfolio";
+import type {
+  AboutData,
+  ProjectData,
+  ExperienceData,
+  CertificationData,
+} from "@/lib/portfolio";
 
 interface CMSClientProps {
   initialAbout: AboutData;
   initialProjects: ProjectData[];
   initialExperiences: ExperienceData[];
+  initialCertifications: CertificationData[];
 }
 
 export default function CMSClient({
   initialAbout,
   initialProjects,
   initialExperiences,
+  initialCertifications,
 }: CMSClientProps) {
   // Navigation tab state
-  const [activeTab, setActiveTab] = useState<"projects" | "experience" | "about">("experience");
+  const [activeTab, setActiveTab] = useState<
+    "certifications" | "projects" | "experience" | "about"
+  >("certifications");
 
   // About form state
   const [aboutData, setAboutData] = useState<AboutData>(initialAbout);
@@ -73,11 +82,157 @@ export default function CMSClient({
   const [newExpSkill, setNewExpSkill] = useState("");
   const [isSavingExperience, setIsSavingExperience] = useState(false);
 
+  // Certifications state
+  const [certificationsList, setCertificationsList] = useState<CertificationData[]>(initialCertifications);
+  const [selectedCertId, setSelectedCertId] = useState<string | null>(
+    initialCertifications.length > 0 ? initialCertifications[0].id : null
+  );
+
+  const selectedCert =
+    certificationsList.find((c) => c.id === selectedCertId) ||
+    certificationsList[0] || {
+      id: "new-cert",
+      title: "",
+      issuer: "",
+      icon: "verified",
+      code: "",
+      year: "2024",
+      date: "Oct 2024",
+      validity: "Valid thru 2027",
+      track: "Cloud Architecture",
+      category: "Cloud",
+      status: "Active & Verified",
+      verify_url: "https://linkedin.com",
+      description: "",
+      skills: [],
+      display_order: certificationsList.length + 1,
+    };
+
+  const [certForm, setCertForm] = useState<CertificationData>(selectedCert);
+  const [newCertSkill, setNewCertSkill] = useState("");
+  const [isSavingCert, setIsSavingCert] = useState(false);
+
   // Feedback Toast
   const [toast, setToast] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
+
+  // -------------------------------------------------------------
+  // CERTIFICATIONS HANDLERS
+  // -------------------------------------------------------------
+  const handleSelectCert = (cert: CertificationData) => {
+    setSelectedCertId(cert.id);
+    setCertForm(cert);
+    setToast(null);
+  };
+
+  const handleCreateNewCert = () => {
+    const newId = `cert-${Date.now()}`;
+    const newCert: CertificationData = {
+      id: newId,
+      title: "New Verified Credential",
+      issuer: "Certification Authority",
+      icon: "workspace_premium",
+      code: `CERT-${new Date().getFullYear()}-001`,
+      year: `${new Date().getFullYear()}`,
+      date: `Jan ${new Date().getFullYear()}`,
+      validity: "Lifetime Credential",
+      track: "Systems Engineering",
+      category: "Cloud",
+      status: "Active & Verified",
+      verify_url: "https://cp.certmetrics.com",
+      description:
+        "Validates technical proficiency in distributed architecture design, containerization, and security.",
+      skills: ["Distributed Systems", "Cloud Architecture"],
+      display_order: certificationsList.length + 1,
+    };
+    setSelectedCertId(newId);
+    setCertForm(newCert);
+    setToast({
+      type: "success",
+      text: "New credential draft created. Fill in details and click Save Credential.",
+    });
+  };
+
+  const handleAddCertSkill = () => {
+    if (!newCertSkill.trim()) return;
+    if (!certForm.skills.includes(newCertSkill.trim())) {
+      setCertForm((prev) => ({
+        ...prev,
+        skills: [...prev.skills, newCertSkill.trim()],
+      }));
+    }
+    setNewCertSkill("");
+  };
+
+  const handleRemoveCertSkill = (skillToRemove: string) => {
+    setCertForm((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((s) => s !== skillToRemove),
+    }));
+  };
+
+  const handleSaveCert = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingCert(true);
+    setToast(null);
+
+    try {
+      const res = await fetch("/api/cms/certifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(certForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setToast({
+          type: "success",
+          text: "Certification saved and synced to SQLite database!",
+        });
+
+        const refreshedRes = await fetch("/api/cms/certifications");
+        const refreshed = await refreshedRes.json();
+        if (refreshed.success) {
+          setCertificationsList(refreshed.data);
+          const found = refreshed.data.find((c: CertificationData) => c.id === certForm.id);
+          if (found) {
+            setSelectedCertId(found.id);
+            setCertForm(found);
+          }
+        }
+      } else {
+        setToast({ type: "error", text: data.error || "Failed to save certification." });
+      }
+    } catch (err) {
+      console.error(err);
+      setToast({ type: "error", text: "Server error saving certification." });
+    } finally {
+      setIsSavingCert(false);
+    }
+  };
+
+  const handleDeleteCert = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this credential?")) return;
+    try {
+      const res = await fetch(`/api/cms/certifications?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        const updated = certificationsList.filter((c) => c.id !== id);
+        setCertificationsList(updated);
+        if (updated.length > 0) {
+          setSelectedCertId(updated[0].id);
+          setCertForm(updated[0]);
+        }
+        setToast({ type: "success", text: "Certification deleted from database." });
+      }
+    } catch (err) {
+      console.error(err);
+      setToast({ type: "error", text: "Failed to delete certification." });
+    }
+  };
 
   // -------------------------------------------------------------
   // EXPERIENCE HANDLERS
@@ -365,14 +520,18 @@ export default function CMSClient({
   };
 
   const currentSaveHandler =
-    activeTab === "experience"
+    activeTab === "certifications"
+      ? handleSaveCert
+      : activeTab === "experience"
       ? handleSaveExperience
       : activeTab === "projects"
       ? handleSaveProject
       : handleSaveAbout;
 
   const currentSaveLoading =
-    activeTab === "experience"
+    activeTab === "certifications"
+      ? isSavingCert
+      : activeTab === "experience"
       ? isSavingExperience
       : activeTab === "projects"
       ? isSavingProject
@@ -420,6 +579,8 @@ export default function CMSClient({
             <span>
               {currentSaveLoading
                 ? "Saving..."
+                : activeTab === "certifications"
+                ? "Save Credential"
                 : activeTab === "experience"
                 ? "Save Experience"
                 : activeTab === "projects"
@@ -434,6 +595,23 @@ export default function CMSClient({
       <div className="border-b border-[#2d3449]/60 bg-[#060e20]/60 px-6 py-2.5 sticky top-16 z-40 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 overflow-x-auto">
           <nav className="flex items-center gap-1.5">
+            {/* Certifications Tab */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("certifications");
+                setToast(null);
+              }}
+              className={`px-3.5 py-1.5 rounded-lg font-mono text-xs transition-all flex items-center gap-2 ${
+                activeTab === "certifications"
+                  ? "bg-[#222a3d] text-[#5eead4] font-medium shadow-sm border border-[#5eead4]/30"
+                  : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]"
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">verified</span>
+              <span>Certifications ({certificationsList.length})</span>
+            </button>
+
             {/* Experience Tab */}
             <button
               type="button"
@@ -491,14 +669,6 @@ export default function CMSClient({
               disabled
               className="px-3.5 py-1.5 rounded-lg font-mono text-xs flex items-center gap-2 text-[#94a3b8]/40 cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-[16px]">verified</span>
-              <span>Certifications (4)</span>
-            </button>
-            <button
-              type="button"
-              disabled
-              className="px-3.5 py-1.5 rounded-lg font-mono text-xs flex items-center gap-2 text-[#94a3b8]/40 cursor-not-allowed"
-            >
               <span className="material-symbols-outlined text-[16px]">memory</span>
               <span>Skills &amp; Writing</span>
             </button>
@@ -542,11 +712,351 @@ export default function CMSClient({
         )}
 
         {/* ============================================================= */}
+        {/* CERTIFICATIONS MODULE TAB                                     */}
+        {/* ============================================================= */}
+        {activeTab === "certifications" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Credentials List */}
+            <div className="lg:col-span-5 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-semibold text-[#dae2fd]">Verified Credentials</h2>
+                  <span className="text-xs font-mono text-[#94a3b8]">{certificationsList.length} entries</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCreateNewCert}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors border border-[#5eead4]/30"
+                >
+                  <span className="material-symbols-outlined text-[16px]">add</span>
+                  <span>+ New Cert</span>
+                </button>
+              </div>
+
+              {/* Cards List matching Stitch Design */}
+              <div className="space-y-3">
+                {certificationsList.map((cert) => {
+                  const isSelected = selectedCertId === cert.id;
+                  return (
+                    <div
+                      key={cert.id}
+                      onClick={() => handleSelectCert(cert)}
+                      className={`p-4 rounded-xl transition-all cursor-pointer border ${
+                        isSelected
+                          ? "bg-[#222a3d] border-[#5eead4]/40 shadow-[0_0_20px_-6px_rgba(94,234,212,0.15)]"
+                          : "bg-[#131b2e] border-[#2d3449]/40 hover:bg-[#171f33]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[#5eead4]/20 text-[#5eead4]">
+                            {cert.category.toUpperCase()}
+                          </span>
+                          <span className="text-xs font-mono text-[#94a3b8]">{cert.year}</span>
+                        </div>
+                        <span className="material-symbols-outlined text-[18px] text-[#5eead4]">
+                          {cert.icon || "verified"}
+                        </span>
+                      </div>
+
+                      <h4
+                        className={`text-sm font-semibold transition-colors ${
+                          isSelected ? "text-[#5eead4]" : "text-[#dae2fd]"
+                        }`}
+                      >
+                        {cert.title}
+                      </h4>
+
+                      <p className="text-xs text-[#94a3b8] mt-0.5">{cert.issuer}</p>
+
+                      <div className="flex items-center justify-between mt-3 text-xs font-mono text-[#94a3b8]">
+                        <span className="truncate max-w-[200px] text-[#859490]">{cert.code}</span>
+                        {certificationsList.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteCert(cert.id);
+                            }}
+                            className="text-red-400 hover:text-red-300 p-1"
+                            title="Delete credential"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">
+                              delete
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right Column: Edit Form */}
+            <form
+              onSubmit={handleSaveCert}
+              className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
+            >
+              <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
+                <div>
+                  <span className="text-xs font-mono text-[#94a3b8]">
+                    CREDENTIAL RECORD · {certForm.code || certForm.id}
+                  </span>
+                  <h3 className="text-lg font-semibold text-[#dae2fd]">
+                    Edit: {certForm.title || "Untitled Credential"}
+                  </h3>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const orig = certificationsList.find((c) => c.id === selectedCertId);
+                      if (orig) setCertForm(orig);
+                      setToast(null);
+                    }}
+                    className="px-3.5 py-1.5 rounded-lg border border-[#2d3449] hover:bg-[#171f33] text-xs font-mono text-[#dae2fd] transition-colors"
+                  >
+                    Discard
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingCert}
+                    className="px-4 py-1.5 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-all disabled:opacity-50"
+                  >
+                    {isSavingCert ? "Saving..." : "Save Credential"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Title & Issuer */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Certification Title
+                  </label>
+                  <input
+                    type="text"
+                    value={certForm.title}
+                    onChange={(e) =>
+                      setCertForm((prev) => ({ ...prev, title: e.target.value }))
+                    }
+                    required
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Issuing Authority
+                  </label>
+                  <input
+                    type="text"
+                    value={certForm.issuer}
+                    onChange={(e) =>
+                      setCertForm((prev) => ({ ...prev, issuer: e.target.value }))
+                    }
+                    required
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Code, Year, Category */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Credential Serial / ID
+                  </label>
+                  <input
+                    type="text"
+                    value={certForm.code}
+                    onChange={(e) =>
+                      setCertForm((prev) => ({ ...prev, code: e.target.value }))
+                    }
+                    required
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Year Issued
+                  </label>
+                  <input
+                    type="text"
+                    value={certForm.year}
+                    onChange={(e) =>
+                      setCertForm((prev) => ({ ...prev, year: e.target.value }))
+                    }
+                    required
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Category Tag
+                  </label>
+                  <input
+                    type="text"
+                    value={certForm.category}
+                    onChange={(e) =>
+                      setCertForm((prev) => ({ ...prev, category: e.target.value }))
+                    }
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#5eead4] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Domain Track, Validity, Icon */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Domain Track
+                  </label>
+                  <input
+                    type="text"
+                    value={certForm.track}
+                    onChange={(e) =>
+                      setCertForm((prev) => ({ ...prev, track: e.target.value }))
+                    }
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Validity Period
+                  </label>
+                  <input
+                    type="text"
+                    value={certForm.validity}
+                    onChange={(e) =>
+                      setCertForm((prev) => ({ ...prev, validity: e.target.value }))
+                    }
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                    Material Icon Name
+                  </label>
+                  <input
+                    type="text"
+                    value={certForm.icon}
+                    onChange={(e) =>
+                      setCertForm((prev) => ({ ...prev, icon: e.target.value }))
+                    }
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#5eead4] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Verification Link */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                  Official Registry Verification Link
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={certForm.verify_url}
+                    onChange={(e) =>
+                      setCertForm((prev) => ({ ...prev, verify_url: e.target.value }))
+                    }
+                    required
+                    className="flex-1 px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                  <a
+                    href={certForm.verify_url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="px-3.5 py-2 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors flex items-center gap-1 shrink-0"
+                  >
+                    <span>Test ↗</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Lightbox Description */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-[#94a3b8] uppercase">
+                  Lightbox Verification Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={certForm.description}
+                  onChange={(e) =>
+                    setCertForm((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  required
+                  className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm text-[#dae2fd] focus:border-[#5eead4] focus:outline-none resize-none leading-relaxed"
+                />
+              </div>
+
+              {/* Verified Competencies */}
+              <div className="space-y-2">
+                <label className="text-xs font-mono text-[#94a3b8] uppercase block">
+                  Verified Competencies &amp; Syllabi
+                </label>
+                <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-[#0b1326] border border-[#2d3449]">
+                  {certForm.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#222a3d] text-xs font-mono text-[#5eead4] border border-[#5eead4]/30"
+                    >
+                      <span>{skill}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCertSkill(skill)}
+                        className="hover:text-red-400"
+                      >
+                        <span className="material-symbols-outlined text-[13px]">
+                          close
+                        </span>
+                      </button>
+                    </span>
+                  ))}
+
+                  <div className="inline-flex items-center gap-1">
+                    <input
+                      type="text"
+                      placeholder="Add competency..."
+                      value={newCertSkill}
+                      onChange={(e) => setNewCertSkill(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddCertSkill();
+                        }
+                      }}
+                      className="bg-transparent text-xs font-mono text-[#dae2fd] px-2 py-1 focus:outline-none w-32"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddCertSkill}
+                      className="text-xs font-mono text-[#5eead4] hover:underline"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* ============================================================= */}
         {/* EXPERIENCE MODULE TAB                                         */}
         {/* ============================================================= */}
         {activeTab === "experience" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Career Positions List */}
             <div className="lg:col-span-5 flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -563,7 +1073,6 @@ export default function CMSClient({
                 </button>
               </div>
 
-              {/* Roles List */}
               <div className="space-y-3">
                 {experiencesList.map((exp) => {
                   const isSelected = selectedExperienceId === exp.id;
@@ -632,7 +1141,6 @@ export default function CMSClient({
               </div>
             </div>
 
-            {/* Right Column: Edit Form */}
             <form
               onSubmit={handleSaveExperience}
               className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
@@ -669,7 +1177,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Role & Company */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-[#94a3b8] uppercase">
@@ -702,7 +1209,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Time Period & Tagline */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-[#94a3b8] uppercase">
@@ -734,7 +1240,6 @@ export default function CMSClient({
                 </div>
               </div>
 
-              {/* Description */}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase">
                   Role Engineering Summary &amp; Key Achievements
@@ -753,7 +1258,6 @@ export default function CMSClient({
                 />
               </div>
 
-              {/* Technologies Used */}
               <div className="space-y-2">
                 <label className="text-xs font-mono text-[#94a3b8] uppercase block">
                   Technologies Used &amp; Key Tools
@@ -810,7 +1314,6 @@ export default function CMSClient({
         {/* ============================================================= */}
         {activeTab === "projects" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Projects List */}
             <div className="lg:col-span-5 flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -890,7 +1393,6 @@ export default function CMSClient({
               </div>
             </div>
 
-            {/* Right Column: Edit Form */}
             <form
               onSubmit={handleSaveProject}
               className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6"
@@ -1104,7 +1606,6 @@ export default function CMSClient({
             onSubmit={handleSaveAbout}
             className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
           >
-            {/* Left Column: Live Preview */}
             <div className="lg:col-span-5 flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-base font-semibold text-[#dae2fd] flex items-center gap-2">
@@ -1132,7 +1633,6 @@ export default function CMSClient({
                   <p className="line-clamp-3">{aboutData.paragraph3}</p>
                 </div>
 
-                {/* Preview Telemetry Widget */}
                 <div className="mt-4 p-3.5 rounded-xl bg-[#131b2e] border border-[#2d3449] shadow-sm">
                   <div className="flex items-center justify-between pb-2 border-b border-[#222a3d]">
                     <span className="font-mono text-[10px] text-[#94a3b8] uppercase tracking-wider flex items-center gap-1.5">
@@ -1173,7 +1673,6 @@ export default function CMSClient({
               </div>
             </div>
 
-            {/* Right Column: About Form */}
             <div className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6">
               <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
                 <div>
