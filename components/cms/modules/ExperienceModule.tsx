@@ -74,7 +74,6 @@ export default function ExperienceModule({
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[#5eead4]/20 text-[#5eead4]">
                     {exp.period}
                   </span>
-                  <span className="text-xs font-mono text-[#94a3b8]">#{exp.id}</span>
                 </div>
 
                 <h4 className={`text-sm font-semibold transition-colors ${isSelected ? "text-[#5eead4]" : "text-[#dae2fd]"}`}>
@@ -117,7 +116,7 @@ export default function ExperienceModule({
         <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
           <div>
             <span className="text-xs font-mono text-[#94a3b8]">
-              {experienceForm.id === 0 ? "NEW ROLE ENTRY" : `EXPERIENCE RECORD · #${experienceForm.id}`}
+              {experienceForm.id === 0 ? "NEW ROLE ENTRY" : "EXPERIENCE RECORD"}
             </span>
             <h3 className="text-lg font-semibold text-[#dae2fd]">
               Edit: {experienceForm.role || "Untitled Position"}

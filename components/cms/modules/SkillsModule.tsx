@@ -80,7 +80,7 @@ export default function SkillsModule({
             <div className="flex items-center justify-between border-b border-[#2d3449]/40 pb-3">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-[#94a3b8]">
-                  CATEGORY #{category.id}
+                  TAXONOMY GROUP
                 </span>
                 <h3 className="text-base font-semibold text-[#5eead4]">{category.title}</h3>
               </div>

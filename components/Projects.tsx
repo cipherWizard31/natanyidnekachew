@@ -48,17 +48,17 @@ export default function Projects({ projects }: ProjectsProps) {
                   {project.description}
                 </p>
 
-                {/* Stars and Forks Counters */}
+                {/* Stars and Users Counters */}
                 <div className="mt-3 flex items-center gap-4 text-[#94a3b8]">
-                  <span className="flex items-center gap-1 font-mono text-xs">
+                  <span className="flex items-center gap-1 font-mono text-xs" title="GitHub Stars">
                     <span className="material-symbols-outlined text-[16px] text-[#5eead4]">
                       star
                     </span>
                     {project.stars}
                   </span>
-                  <span className="flex items-center gap-1 font-mono text-xs">
-                    <span className="material-symbols-outlined text-[16px] text-[#94a3b8]">
-                      fork_right
+                  <span className="flex items-center gap-1 font-mono text-xs" title="Active Users">
+                    <span className="material-symbols-outlined text-[16px] text-[#5eead4]/80">
+                      group
                     </span>
                     {project.forks}
                   </span>

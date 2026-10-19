@@ -77,14 +77,17 @@ export default function ProjectsModule({
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[#5eead4]/20 text-[#5eead4]">
-                      #{project.id}
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono text-[#94a3b8] bg-[#0b1326]">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono text-[#5eead4] bg-[#5eead4]/10 border border-[#5eead4]/20 font-medium">
                       {project.skills[0] || "SYSTEM"}
                     </span>
                   </div>
-                  <span className="text-xs font-mono text-[#94a3b8]">★ {project.stars}</span>
+                  <div className="flex items-center gap-2 text-xs font-mono text-[#94a3b8]">
+                    <span>★ {project.stars}</span>
+                    <span className="flex items-center gap-0.5">
+                      <span className="material-symbols-outlined text-[13px] text-[#5eead4]">group</span>
+                      {project.forks}
+                    </span>
+                  </div>
                 </div>
 
                 <h4 className={`text-sm font-semibold transition-colors ${isSelected ? "text-[#5eead4]" : "text-[#dae2fd]"}`}>
@@ -93,12 +96,12 @@ export default function ProjectsModule({
                 <p className="text-xs text-[#bbcac5] mt-1 line-clamp-2">{project.description}</p>
 
                 <div className="flex items-center justify-between mt-3 text-xs font-mono text-[#94a3b8]">
-                  <span className="truncate max-w-[200px]">{project.url}</span>
+                  <span className="truncate max-w-[200px] text-[#859490]">{project.url}</span>
                   {projectsList.length > 1 && (
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); onDelete(project.id); }}
-                      className="text-red-400 hover:text-red-300 p-1"
+                      className="text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-950/30 transition-colors"
                       title="Delete project"
                     >
                       <span className="material-symbols-outlined text-[16px]">delete</span>
@@ -119,7 +122,7 @@ export default function ProjectsModule({
         <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
           <div>
             <span className="text-xs font-mono text-[#94a3b8]">
-              {projectForm.id === 0 ? "NEW PROJECT ENTRY" : `PROJECT SPEC · #${projectForm.id}`}
+              {projectForm.id === 0 ? "NEW PROJECT ENTRY" : "PROJECT SPECIFICATION"}
             </span>
             <h3 className="text-lg font-semibold text-[#dae2fd]">
               Edit: {projectForm.title || "Untitled Project"}
@@ -164,8 +167,8 @@ export default function ProjectsModule({
               onChange={(e) => onFormChange({ ...projectForm, stars: e.target.value })} />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-mono text-[#94a3b8] uppercase">Forks Count</label>
-            <input type="text" value={projectForm.forks} className={`${inputCls} font-mono`}
+            <label className="text-xs font-mono text-[#94a3b8] uppercase">Users Count</label>
+            <input type="text" placeholder="e.g. 50K+" value={projectForm.forks} className={`${inputCls} font-mono`}
               onChange={(e) => onFormChange({ ...projectForm, forks: e.target.value })} />
           </div>
         </div>

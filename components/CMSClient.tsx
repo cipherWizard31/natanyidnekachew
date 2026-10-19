@@ -666,7 +666,17 @@ export default function CMSClient({
       });
       const data = await res.json();
       if (data.success) {
-        setProjectsList((prev) => prev.filter((p) => p.id !== id));
+        setProjectsList((prev) => {
+          const updated = prev.filter((p) => p.id !== id);
+          if (selectedProjectId === id) {
+            const nextSelected = updated.length > 0 ? updated[0] : null;
+            setSelectedProjectId(nextSelected ? nextSelected.id : null);
+            if (nextSelected) {
+              setProjectForm(nextSelected);
+            }
+          }
+          return updated;
+        });
         setToast({ type: "success", text: "Project deleted." });
       }
     } catch {
