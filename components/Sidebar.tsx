@@ -15,7 +15,6 @@ const navItems: NavItem[] = [
   { id: "experience", label: "Experience" },
   { id: "certifications", label: "Certifications" },
   { id: "writing", label: "Skills & Writing" },
-  { id: "philosophy", label: "Philosophy" },
 ];
 
 interface SidebarProps {

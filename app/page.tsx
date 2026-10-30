@@ -31,6 +31,9 @@ export default function Home() {
             {/* About Section */}
             <About about={data.about} />
 
+            {/* Philosophy Section */}
+            <Philosophy philosophy={data.philosophy} />
+
             {/* Projects Section */}
             <Projects projects={data.projects} />
 
@@ -48,9 +51,6 @@ export default function Home() {
               skillCategories={data.skillCategories}
               articles={data.articles}
             />
-
-            {/* Philosophy Section */}
-            <Philosophy philosophy={data.philosophy} />
           </main>
         </div>
       </div>

@@ -807,7 +807,23 @@ export default function CMSClient({
               <span className="whitespace-nowrap">About Section</span>
             </button>
 
-            {/* Projects Tab — matches portfolio order: 2nd */}
+            {/* Philosophy Tab — headline next to About tab: 2nd */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("philosophy");
+                setToast(null);
+              }}
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${activeTab === "philosophy"
+                ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
+                }`}
+            >
+              <span className="material-symbols-outlined text-[16px] shrink-0">psychology</span>
+              <span className="whitespace-nowrap">Philosophy</span>
+            </button>
+
+            {/* Projects Tab — matches portfolio order: 3rd */}
             <button
               type="button"
               onClick={() => {
@@ -823,7 +839,7 @@ export default function CMSClient({
               <span className="whitespace-nowrap">Projects ({projectsList.length})</span>
             </button>
 
-            {/* Experience Tab — matches portfolio order: 3rd */}
+            {/* Experience Tab — matches portfolio order: 4th */}
             <button
               type="button"
               onClick={() => {
@@ -839,7 +855,7 @@ export default function CMSClient({
               <span className="whitespace-nowrap">Experience ({experiencesList.length})</span>
             </button>
 
-            {/* Certifications Tab — matches portfolio order: 4th */}
+            {/* Certifications Tab — matches portfolio order: 5th */}
             <button
               type="button"
               onClick={() => {
@@ -855,7 +871,7 @@ export default function CMSClient({
               <span className="whitespace-nowrap">Certifications ({certificationsList.length})</span>
             </button>
 
-            {/* Technical Arsenal & Writing Tab — matches portfolio order: 5th */}
+            {/* Technical Arsenal & Writing Tab — matches portfolio order: 6th */}
             <button
               type="button"
               onClick={() => {
@@ -869,22 +885,6 @@ export default function CMSClient({
             >
               <span className="material-symbols-outlined text-[16px] shrink-0">memory</span>
               <span className="whitespace-nowrap">Technical Arsenal</span>
-            </button>
-
-            {/* Philosophy Tab — matches portfolio order: 6th */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("philosophy");
-                setToast(null);
-              }}
-              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${activeTab === "philosophy"
-                ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
-                : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
-                }`}
-            >
-              <span className="material-symbols-outlined text-[16px] shrink-0">psychology</span>
-              <span className="whitespace-nowrap">Philosophy</span>
             </button>
           </nav>
 
