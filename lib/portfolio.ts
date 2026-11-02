@@ -31,6 +31,10 @@ export interface AboutData {
   stat_users?: string;
   stat_uptime?: string;
   stat_experience?: string;
+  stat_experience_label?: string;
+  stat_apps_label?: string;
+  stat_tech_label?: string;
+  stat_users_label?: string;
 }
 
 export interface ProjectData {

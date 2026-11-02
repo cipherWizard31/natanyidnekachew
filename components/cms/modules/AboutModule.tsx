@@ -58,17 +58,17 @@ export default function AboutModule({
                 Client Stats &amp; Impact
               </span>
               <span className="font-mono text-[10px] text-[#5eead4] font-medium">
-                {aboutData.stat_experience || "4+ Yrs"} Experience
+                {aboutData.stat_experience || "6+ Yrs"} {aboutData.stat_experience_label || "Experience"}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-2 pt-1 text-left">
               {[
-                { label: "Shipped Projects", value: aboutData.stat_projects || "12+", color: "text-[#e2e8f0]" },
-                { label: "Active Users",     value: aboutData.stat_users || "50K+",   color: "text-[#e2e8f0]" },
-                { label: "System Uptime",   value: aboutData.stat_uptime || "99.99%", color: "text-[#5eead4]" },
+                { label: aboutData.stat_apps_label || "Apps Built",  value: aboutData.stat_projects || "12+", color: "text-[#e2e8f0]" },
+                { label: aboutData.stat_tech_label || "Tech",        value: aboutData.stat_users || "50K+",   color: "text-[#e2e8f0]" },
+                { label: aboutData.stat_users_label || "Total Users", value: aboutData.stat_uptime || "99.99%", color: "text-[#5eead4]" },
               ].map(({ label, value, color }) => (
                 <div key={label}>
-                  <span className="font-mono text-[10px] text-[#94a3b8] block">{label}</span>
+                  <span className="font-mono text-[10px] text-[#94a3b8] block truncate">{label}</span>
                   <span className={`font-mono text-xs font-semibold ${color}`}>{value}</span>
                 </div>
               ))}
@@ -128,30 +128,77 @@ export default function AboutModule({
 
         {/* Client Stats & Impact Metric Controls */}
         <div className="pt-2 border-t border-[#2d3449]/40 space-y-4">
-          <span className="font-mono text-xs uppercase tracking-wider text-[#5eead4] font-medium block">
-            Client Stats &amp; Impact Controls
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {(
-              [
-                { name: "stat_projects"   as const, label: "Shipped Projects (e.g. 12+)",     mono: true,  accent: false, placeholder: "12+" },
-                { name: "stat_users"      as const, label: "Active Users (e.g. 50K+)",         mono: true,  accent: false, placeholder: "50K+" },
-                { name: "stat_uptime"     as const, label: "System Uptime (e.g. 99.99%)",      mono: true,  accent: true,  placeholder: "99.99%" },
-                { name: "stat_experience" as const, label: "Engineering Tenure (e.g. 4+ Yrs)", mono: true,  accent: true,  placeholder: "4+ Yrs" },
-              ] as const
-            ).map(({ name, label, accent, placeholder }) => (
-              <div key={name} className="space-y-1.5">
-                <label className="text-xs font-mono text-[#94a3b8] uppercase">{label}</label>
-                <input
-                  type="text"
-                  name={name}
-                  placeholder={placeholder}
-                  value={aboutData[name] || ""}
-                  onChange={(e) => onChange({ ...aboutData, [name]: e.target.value })}
-                  className={`w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono focus:border-[#5eead4] focus:outline-none ${
-                    accent ? "text-[#5eead4]" : "text-[#dae2fd]"
-                  }`}
-                />
+          <div>
+            <span className="font-mono text-xs uppercase tracking-wider text-[#5eead4] font-medium block">
+              About Section Stats &amp; Impact Controls
+            </span>
+            <p className="text-xs text-[#94a3b8] mt-1">
+              Customize both the labels and values shown in the stats bar on your portfolio About section.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              {
+                labelName: "stat_experience_label" as const,
+                labelTitle: "Stat 1 Label",
+                labelDefault: "Experience",
+                valName: "stat_experience" as const,
+                valTitle: "Stat 1 Value",
+                valDefault: "6+ Yrs",
+                accent: false,
+              },
+              {
+                labelName: "stat_apps_label" as const,
+                labelTitle: "Stat 2 Label",
+                labelDefault: "Apps Built",
+                valName: "stat_projects" as const,
+                valTitle: "Stat 2 Value",
+                valDefault: "12+",
+                accent: true,
+              },
+              {
+                labelName: "stat_tech_label" as const,
+                labelTitle: "Stat 3 Label",
+                labelDefault: "Tech",
+                valName: "stat_users" as const,
+                valTitle: "Stat 3 Value",
+                valDefault: "50K+",
+                accent: false,
+              },
+              {
+                labelName: "stat_users_label" as const,
+                labelTitle: "Stat 4 Label",
+                labelDefault: "Total Users",
+                valName: "stat_uptime" as const,
+                valTitle: "Stat 4 Value",
+                valDefault: "99.99%",
+                accent: true,
+              },
+            ].map(({ labelName, labelTitle, labelDefault, valName, valTitle, valDefault, accent }) => (
+              <div key={labelName} className="p-3.5 rounded-xl bg-[#0b1326]/80 border border-[#2d3449] grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-mono text-[#94a3b8] uppercase">{labelTitle}</label>
+                  <input
+                    type="text"
+                    placeholder={labelDefault}
+                    value={aboutData[labelName] ?? ""}
+                    onChange={(e) => onChange({ ...aboutData, [labelName]: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg bg-[#131b2e] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-mono text-[#94a3b8] uppercase">{valTitle}</label>
+                  <input
+                    type="text"
+                    placeholder={valDefault}
+                    value={aboutData[valName] ?? ""}
+                    onChange={(e) => onChange({ ...aboutData, [valName]: e.target.value })}
+                    className={`w-full px-3 py-2 rounded-lg bg-[#131b2e] border border-[#2d3449] text-sm font-mono focus:border-[#5eead4] focus:outline-none ${
+                      accent ? "text-[#5eead4]" : "text-[#dae2fd]"
+                    }`}
+                  />
+                </div>
               </div>
             ))}
           </div>

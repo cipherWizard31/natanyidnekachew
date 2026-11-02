@@ -31,6 +31,10 @@ export async function POST(req: Request) {
       stat_users = "50K+",
       stat_uptime = "99.99%",
       stat_experience = "4+ Yrs",
+      stat_experience_label = "Experience",
+      stat_apps_label = "Apps Built",
+      stat_tech_label = "Tech",
+      stat_users_label = "Total Users",
     } = body;
 
     const db = getDb();
@@ -51,7 +55,11 @@ export async function POST(req: Request) {
             stat_projects = ?,
             stat_users = ?,
             stat_uptime = ?,
-            stat_experience = ?
+            stat_experience = ?,
+            stat_experience_label = ?,
+            stat_apps_label = ?,
+            stat_tech_label = ?,
+            stat_users_label = ?
         WHERE id = ?
       `).run(
         paragraph1,
@@ -65,12 +73,20 @@ export async function POST(req: Request) {
         stat_users,
         stat_uptime,
         stat_experience,
+        stat_experience_label,
+        stat_apps_label,
+        stat_tech_label,
+        stat_users_label,
         existing.id
       );
     } else {
       db.prepare(`
-        INSERT INTO about (paragraph1, paragraph2, paragraph3, runtime_version, target_qps, consensus, p99_latency, stat_projects, stat_users, stat_uptime, stat_experience)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO about (
+          paragraph1, paragraph2, paragraph3, runtime_version, target_qps, consensus, p99_latency,
+          stat_projects, stat_users, stat_uptime, stat_experience,
+          stat_experience_label, stat_apps_label, stat_tech_label, stat_users_label
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(
         paragraph1,
         paragraph2,
@@ -82,7 +98,11 @@ export async function POST(req: Request) {
         stat_projects,
         stat_users,
         stat_uptime,
-        stat_experience
+        stat_experience,
+        stat_experience_label,
+        stat_apps_label,
+        stat_tech_label,
+        stat_users_label
       );
     }
 

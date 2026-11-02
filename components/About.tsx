@@ -24,33 +24,25 @@ export default function About({ about }: AboutProps) {
         {about.paragraph3 && <p>{about.paragraph3}</p>}
       </div>
 
-      {/* Engineering Impact / Telemetry Pill Bar (preserving CMS telemetry fields elegantly) */}
-      {(about.stat_experience || about.target_qps || about.stat_uptime || about.p99_latency) && (
+      {/* Engineering Impact / Telemetry Pill Bar */}
+      {(about.stat_experience || about.stat_projects || about.stat_uptime || about.stat_users || about.target_qps || about.consensus || about.p99_latency) && (
         <div className="mt-8 pt-6 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {about.stat_experience && (
-            <div>
-              <div className="font-mono text-xs uppercase text-slate-500">Experience</div>
-              <div className="font-medium text-slate-200 mt-1">{about.stat_experience}</div>
-            </div>
-          )}
-          {(about.target_qps || about.stat_projects) && (
-            <div>
-              <div className="font-mono text-xs uppercase text-slate-500">Scale / Throughput</div>
-              <div className="font-medium text-teal-300 mt-1">{about.target_qps || about.stat_projects}</div>
-            </div>
-          )}
-          {(about.consensus || about.stat_users) && (
-            <div>
-              <div className="font-mono text-xs uppercase text-slate-500">Consensus / Tech</div>
-              <div className="font-medium text-slate-200 mt-1">{about.consensus || about.stat_users}</div>
-            </div>
-          )}
-          {(about.p99_latency || about.stat_uptime) && (
-            <div>
-              <div className="font-mono text-xs uppercase text-slate-500">P99 Latency</div>
-              <div className="font-medium text-teal-300 mt-1">{about.p99_latency || about.stat_uptime}</div>
-            </div>
-          )}
+          <div>
+            <div className="font-mono text-xs uppercase text-slate-500">{about.stat_experience_label || "Experience"}</div>
+            <div className="font-medium text-slate-200 mt-1">{about.stat_experience || "6+ Yrs"}</div>
+          </div>
+          <div>
+            <div className="font-mono text-xs uppercase text-slate-500">{about.stat_apps_label || "Apps Built"}</div>
+            <div className="font-medium text-teal-300 mt-1">{about.stat_projects || about.target_qps || "12+"}</div>
+          </div>
+          <div>
+            <div className="font-mono text-xs uppercase text-slate-500">{about.stat_tech_label || "Tech"}</div>
+            <div className="font-medium text-slate-200 mt-1">{about.stat_users || about.consensus || "50K+"}</div>
+          </div>
+          <div>
+            <div className="font-mono text-xs uppercase text-slate-500">{about.stat_users_label || "Total Users"}</div>
+            <div className="font-medium text-teal-300 mt-1">{about.stat_uptime || about.p99_latency || "99.99%"}</div>
+          </div>
         </div>
       )}
     </section>
