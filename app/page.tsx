@@ -3,39 +3,35 @@ import About from "@/components/About";
 import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import Certifications from "@/components/Certifications";
-import SkillsWriting from "@/components/SkillsWriting";
-import Philosophy from "@/components/Philosophy";
+import Testimonials from "@/components/Testimonials";
+
+import SpotlightBackground from "@/components/SpotlightBackground";
 import { getPortfolioData } from "@/lib/portfolio";
 
 export default function Home() {
   const data = getPortfolioData();
 
   return (
-    <div className="relative min-h-screen bg-[#0b1326] text-[#bbcac5] selection:bg-[#5eead4] selection:text-[#00675b]">
-      {/* Background ambient radial glow */}
-      <div
-        className="pointer-events-none fixed inset-0 z-30 transition duration-300 lg:absolute"
-        style={{
-          background:
-            "radial-gradient(600px at 50% 50%, rgba(94, 234, 212, 0.06), transparent 80%)",
-        }}
-      />
+    <div className="relative">
+      {/* Interactive mouse spotlight background tracking cursor */}
+      <SpotlightBackground />
 
-      <div className="mx-auto min-h-screen max-w-7xl px-6 md:px-12 lg:px-24">
-        <div className="lg:flex lg:justify-between lg:gap-12">
-          {/* Rebranded Sidebar powered by SQLite */}
+      <div className="mx-auto min-h-screen max-w-screen-xl px-6 py-12 font-sans md:px-12 md:py-16 lg:py-0">
+        <a
+          href="#content"
+          className="absolute left-0 top-0 block -translate-x-full rounded bg-teal-300 px-4 py-3 text-sm font-bold uppercase tracking-widest text-slate-900 focus-visible:translate-x-0 focus-visible:text-slate-900 z-50 transition"
+        >
+          Skip to Content
+        </a>
+
+        <div className="lg:flex lg:justify-between lg:gap-4">
+          {/* Left sticky sidebar */}
           <Sidebar profile={data.profile} socialLinks={data.socialLinks} />
 
-          {/* Main content sections powered by SQLite */}
-          <main className="lg:w-1/2 lg:py-16 pt-8 pb-16 relative">
+          {/* Right main scrolling content */}
+          <main id="content" className="pt-24 lg:w-[52%] lg:py-24">
             {/* About Section */}
             <About about={data.about} />
-
-            {/* Philosophy Section */}
-            <Philosophy philosophy={data.philosophy} />
-
-            {/* Projects Section */}
-            <Projects projects={data.projects} />
 
             {/* Experience Section */}
             <Experience
@@ -43,14 +39,15 @@ export default function Home() {
               resumeUrl={data.profile.resume_url}
             />
 
+            {/* Projects Section */}
+            <Projects projects={data.projects} />
+
             {/* Certifications Section */}
             <Certifications certifications={data.certifications} />
 
-            {/* Skills & Writing Section */}
-            <SkillsWriting
-              skillCategories={data.skillCategories}
-              articles={data.articles}
-            />
+            {/* Testimonials Section (Final section before footer) */}
+            <Testimonials testimonials={data.testimonials} />
+
           </main>
         </div>
       </div>

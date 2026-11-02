@@ -103,6 +103,20 @@ export interface PhilosophyData {
   copyright: string;
 }
 
+export interface TestimonialData {
+  id: number;
+  name: string;
+  role: string;
+  company?: string;
+  avatar_url?: string;
+  relationship?: string;
+  content: string;
+  rating?: number;
+  status: "pending" | "approved" | "rejected";
+  display_order: number;
+  created_at?: string;
+}
+
 export interface PortfolioDatabaseContent {
   profile: ProfileData;
   socialLinks: SocialLinkData[];
@@ -113,6 +127,7 @@ export interface PortfolioDatabaseContent {
   skillCategories: SkillCategoryData[];
   articles: ArticleData[];
   philosophy: PhilosophyData;
+  testimonials: TestimonialData[];
 }
 
 export function getPortfolioData(): PortfolioDatabaseContent {
@@ -169,6 +184,11 @@ export function getPortfolioData(): PortfolioDatabaseContent {
     .prepare("SELECT * FROM philosophy LIMIT 1")
     .get() as PhilosophyData;
 
+  // Retrieve approved testimonials for public display
+  const testimonials = db
+    .prepare("SELECT * FROM testimonials WHERE status = 'approved' ORDER BY display_order ASC, id DESC")
+    .all() as TestimonialData[];
+
   return {
     profile,
     socialLinks,
@@ -179,5 +199,13 @@ export function getPortfolioData(): PortfolioDatabaseContent {
     skillCategories,
     articles,
     philosophy,
+    testimonials,
   };
+}
+
+export function getAllTestimonials(): TestimonialData[] {
+  const db = getDb();
+  return db
+    .prepare("SELECT * FROM testimonials ORDER BY created_at DESC, id DESC")
+    .all() as TestimonialData[];
 }

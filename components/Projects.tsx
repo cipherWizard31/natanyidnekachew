@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { ProjectData } from "@/lib/portfolio";
+import { Arrow } from "./Arrow";
 
 interface ProjectsProps {
   projects: ProjectData[];
@@ -9,108 +10,130 @@ export default function Projects({ projects }: ProjectsProps) {
   return (
     <section
       id="projects"
-      aria-label="Featured projects"
-      className="mb-16 md:mb-24 scroll-mt-16 lg:scroll-mt-24"
+      aria-label="What I've Built"
+      className="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24"
     >
-      {/* Mobile Sticky Section Header */}
-      <div className="sticky top-0 z-20 -mx-6 px-6 py-4 backdrop-blur-md bg-[#0b1326]/80 lg:relative lg:top-auto lg:mx-0 lg:px-0 lg:py-0 lg:backdrop-blur-none lg:bg-transparent">
-        <h2 className="text-sm uppercase tracking-widest text-[#e2e8f0] font-bold lg:sr-only flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#5eead4] inline-block"></span>
-          Projects
+      {/* Sticky Mobile Header */}
+      <div className="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">
+          What I&apos;ve Built
         </h2>
       </div>
 
-      <div className="mt-4 lg:mt-0 flex flex-col gap-6">
-        {projects.map((project) => (
-          <div
-            key={project.id}
-            className="group relative rounded-xl p-6 bg-[#171f33]/30 hover:bg-[#171f33]/80 border border-[#2d3449]/40 hover:border-[#5eead4]/30 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-0.5"
-          >
-            <div className="flex flex-col-reverse sm:flex-row sm:gap-6">
-              {/* Left Column: Info & Stats */}
-              <div className="sm:w-2/3">
-                <h3 className="text-lg font-semibold text-[#e2e8f0] flex items-center gap-1 group-hover:text-[#5eead4] transition-colors duration-200">
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="focus:outline-none"
-                  >
-                    <span className="absolute -inset-x-4 -inset-y-2.5 hidden rounded md:-inset-x-6 md:-inset-y-4 lg:block" />
-                    <span>{project.title}</span>
-                  </a>
-                  <span className="material-symbols-outlined text-[18px] transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-200 text-[#94a3b8] group-hover:text-[#5eead4]">
-                    arrow_outward
-                  </span>
-                </h3>
+      <div>
+        <ul className="group/list">
+          {projects.map((project) => (
+            <li key={project.id} className="mb-12">
+              <div className="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+                {/* Spotlight background on hover */}
+                <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition motion-reduce:transition-none lg:-inset-x-6 lg:block lg:group-hover:bg-slate-800/50 lg:group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] lg:group-hover:drop-shadow-lg" />
 
-                <p className="mt-2.5 text-sm text-[#bbcac5] leading-relaxed">
-                  {project.description}
-                </p>
-
-                {/* Stars and Users Counters */}
-                <div className="mt-3 flex items-center gap-4 text-[#94a3b8]">
-                  <span className="flex items-center gap-1 font-mono text-xs" title="GitHub Stars">
-                    <span className="material-symbols-outlined text-[16px] text-[#5eead4]">
-                      star
-                    </span>
-                    {project.stars}
-                  </span>
-                  <span className="flex items-center gap-1 font-mono text-xs" title="Active Users">
-                    <span className="material-symbols-outlined text-[16px] text-[#5eead4]/80">
-                      group
-                    </span>
-                    {project.forks}
-                  </span>
-                </div>
-
-                {/* Tech Badges */}
-                <ul
-                  aria-label="Technologies used"
-                  className="mt-4 flex flex-wrap gap-1.5"
-                >
-                  {project.skills.map((skill) => (
-                    <li
-                      key={skill}
-                      className="px-3 py-1 rounded-full bg-[#5eead4]/10 text-[#5eead4] border border-[#5eead4]/20 font-mono text-xs font-medium"
+                {/* Right / Main Info Column */}
+                <div className="z-10 sm:order-2 sm:col-span-6">
+                  <h3>
+                    <a
+                      className="inline-flex items-baseline font-medium leading-tight text-slate-200 hover:text-teal-300 focus-visible:text-teal-300 group/link text-base"
+                      href={project.url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      aria-label={`${project.title} (opens in a new tab)`}
                     >
-                      {skill}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                      <span className="absolute -inset-x-4 -inset-y-2.5 hidden rounded md:-inset-x-6 md:-inset-y-4 lg:block" />
+                      <span>
+                        {project.title}{" "}
+                        <span className="inline-block">
+                          <Arrow external />
+                        </span>
+                      </span>
+                    </a>
+                  </h3>
 
-              {/* Right Column: Visual Thumbnail loaded from DB random hash URL */}
-              <div className="sm:w-1/3 mb-4 sm:mb-0 shrink-0">
-                <div className="relative rounded-lg overflow-hidden h-36 sm:h-full bg-[#222a3d] border border-[#2d3449]/60 shadow-md">
-                  <Image
-                    src={project.image_url}
-                    alt={project.image_alt}
-                    width={400}
-                    height={250}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#060e20]/70 via-transparent to-transparent pointer-events-none" />
+                  <p className="mt-2 text-sm leading-normal text-slate-400">
+                    {project.description}
+                  </p>
+
+                  {/* Stars / Forks metrics if available */}
+                  {(project.stars || project.forks) && (
+                    <div className="mt-2 flex items-center gap-4 text-xs font-mono text-slate-400">
+                      {project.stars && (
+                        <span className="inline-flex items-center gap-1 hover:text-slate-200">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            className="w-3.5 h-3.5 text-slate-400"
+                            aria-hidden="true"
+                          >
+                            <path d="M12 .7 15.46 7.7l7.73 1.12-5.6 5.46 1.33 7.7L12 18.35l-6.92 3.63 1.32-7.7L.8 8.82 8.54 7.7z" />
+                          </svg>
+                          <span>{project.stars}</span>
+                        </span>
+                      )}
+                      {project.forks && (
+                        <span className="inline-flex items-center gap-1 hover:text-slate-200">
+                          <svg
+                            viewBox="0 0 16 16"
+                            fill="currentColor"
+                            className="w-3.5 h-3.5 text-slate-400"
+                            aria-hidden="true"
+                          >
+                            <path d="M5 3.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v.878A2.25 2.25 0 005.75 8.5h4.5A2.25 2.25 0 0012.5 6.25v-.878a2.25 2.25 0 10-1.5 0v.878a.75.75 0 01-.75.75h-4.5A.75.75 0 015 6.25v-.878zm6.5-2.122a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM8 10.5a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v1.628a.75.75 0 001.5 0v-1.628z" />
+                          </svg>
+                          <span>{project.forks}</span>
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tech stack tags */}
+                  {project.skills && project.skills.length > 0 && (
+                    <ul className="mt-2 flex flex-wrap" aria-label="Technologies used:">
+                      {project.skills.map((skill) => (
+                        <li key={skill} className="mr-1.5 mt-2">
+                          <div className="flex items-center rounded-full bg-teal-400/10 px-3 py-1 text-xs font-medium leading-5 text-teal-300">
+                            {skill}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
 
-      {/* Project Archive Link */}
-      <div className="mt-8">
-        <a
-          href="https://github.com/cipherWizard31"
-          target="_blank"
-          rel="noreferrer noopener"
-          className="inline-flex items-center gap-2 font-mono text-sm text-[#e2e8f0] hover:text-[#5eead4] transition-colors duration-200 group"
-        >
-          <span className="font-medium">View Full Project Archive</span>
-          <span className="material-symbols-outlined text-[18px] transform group-hover:translate-x-1 transition-transform duration-200">
-            arrow_forward
-          </span>
-        </a>
+                {/* Left Thumbnail Column */}
+                {project.image_url && (
+                  <div className="z-10 sm:order-1 sm:col-span-2 sm:translate-y-1">
+                    <Image
+                      alt={project.image_alt || project.title}
+                      loading="lazy"
+                      width={200}
+                      height={48}
+                      src={project.image_url}
+                      className="aspect-video w-full object-cover rounded border-2 border-slate-200/10 transition group-hover:border-slate-200/30"
+                    />
+                  </div>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* View Full Project Archive Link */}
+        <div className="mt-12">
+          <a
+            className="inline-flex items-baseline font-medium leading-tight text-slate-200 hover:text-teal-300 focus-visible:text-teal-300 font-semibold group/link text-base"
+            href="https://github.com/cipherWizard31"
+            target="_blank"
+            rel="noreferrer noopener"
+            aria-label="View Full Project Archive (opens in a new tab)"
+          >
+            <span>
+              View Full Project{" "}
+              <span className="inline-block">
+                Archive
+                <Arrow external />
+              </span>
+            </span>
+          </a>
+        </div>
       </div>
     </section>
   );

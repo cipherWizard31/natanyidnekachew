@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { CertificationData } from "@/lib/portfolio";
+import { Arrow } from "./Arrow";
 
 interface CertificationsProps {
   certifications: CertificationData[];
@@ -13,265 +14,146 @@ export default function Certifications({ certifications }: CertificationsProps) 
   return (
     <section
       id="certifications"
-      aria-label="Certifications & Learning"
-      className="mb-16 md:mb-24 scroll-mt-16 lg:scroll-mt-24"
+      aria-label="Certifications & credentials"
+      className="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24"
     >
-      {/* Mobile Sticky Section Header */}
-      <div className="sticky top-0 z-20 -mx-6 px-6 py-4 backdrop-blur-md bg-[#0b1326]/80 lg:relative lg:top-auto lg:mx-0 lg:px-0 lg:py-0 lg:backdrop-blur-none lg:bg-transparent">
-        <h2 className="text-sm uppercase tracking-widest text-[#e2e8f0] font-bold lg:sr-only flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#5eead4] inline-block"></span>
+      {/* Sticky Mobile Header */}
+      <div className="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">
           Certifications
         </h2>
       </div>
 
-      <div className="mt-4 lg:mt-0">
-        {/* Section Title Header */}
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-[#e2e8f0] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#5eead4] text-[20px]">
-              verified
-            </span>
-            <span>Certifications &amp; Learning</span>
-          </h3>
-          <span className="font-mono text-xs text-[#94a3b8] flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#5eead4]"></span>
-            {certifications.length} Verified Credentials
-          </span>
-        </div>
-
-        {/* Credentials Grid from SQLite DB */}
-        <div className="grid grid-cols-1 gap-3">
+      <div>
+        <ol className="group/list">
           {certifications.map((cred) => (
-            <button
-              key={cred.id}
-              onClick={() => setSelectedCert(cred)}
-              type="button"
-              className="text-left w-full group relative block p-4 rounded-xl bg-[#171f33]/30 hover:bg-[#171f33]/80 border border-[#2d3449]/40 hover:border-[#5eead4]/40 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#5eead4]/50 shadow-sm hover:shadow-md"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3">
-                  {/* Icon Box */}
-                  <div className="w-9 h-9 rounded-lg bg-[#5eead4]/10 border border-[#5eead4]/20 flex items-center justify-center shrink-0 text-[#5eead4] mt-0.5 group-hover:bg-[#5eead4]/20 transition-colors">
-                    <span className="material-symbols-outlined text-[20px]">
-                      {cred.icon}
-                    </span>
-                  </div>
+            <li key={cred.id} className="mb-10">
+              <div
+                onClick={() => setSelectedCert(cred)}
+                className="group relative grid pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50 cursor-pointer"
+              >
+                {/* Spotlight background */}
+                <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition motion-reduce:transition-none lg:-inset-x-6 lg:block lg:group-hover:bg-slate-800/50 lg:group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] lg:group-hover:drop-shadow-lg" />
 
-                  {/* Details */}
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="text-base font-semibold text-[#e2e8f0] group-hover:text-[#5eead4] transition-colors duration-200">
-                        {cred.title}
-                      </h4>
-                      <span className="font-mono text-[11px] px-2 py-0.5 rounded-full bg-[#5eead4]/10 text-[#5eead4] opacity-0 group-hover:opacity-100 transition-all duration-200 inline-flex items-center gap-0.5">
-                        Inspect Credential
-                        <span className="material-symbols-outlined text-[13px]">
-                          open_in_new
+                {/* Left Year/Date header */}
+                <header
+                  className="z-10 mb-2 mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:col-span-2"
+                  aria-label={cred.year || cred.date}
+                >
+                  {cred.year || cred.date}
+                </header>
+
+                {/* Right Content */}
+                <div className="z-10 sm:col-span-6">
+                  <h3 className="font-medium leading-snug text-slate-200">
+                    <span className="inline-flex items-baseline font-medium leading-tight text-slate-200 group-hover:text-teal-300 transition-colors text-base">
+                      <span className="absolute -inset-x-4 -inset-y-2.5 hidden rounded md:-inset-x-6 md:-inset-y-4 lg:block" />
+                      <span>
+                        {cred.title} ·{" "}
+                        <span className="inline-block text-slate-400 group-hover:text-teal-300">
+                          {cred.issuer}
                         </span>
                       </span>
-                    </div>
+                    </span>
+                  </h3>
 
-                    <p className="text-xs text-[#94a3b8] mt-1 flex items-center gap-2">
-                      <span>{cred.issuer}</span>
-                      <span className="w-1 h-1 rounded-full bg-[#94a3b8]/50"></span>
-                      <span className="font-mono text-[11px] text-[#859490]">
-                        {cred.code}
-                      </span>
-                    </p>
+                  <p className="mt-2 text-sm leading-normal text-slate-400">
+                    {cred.description}
+                  </p>
+
+                  <div className="mt-2 flex items-center gap-3 text-xs font-mono text-slate-500">
+                    {cred.code && <span>ID: {cred.code}</span>}
+                    {cred.status && (
+                      <span className="text-teal-300/80">● {cred.status}</span>
+                    )}
                   </div>
-                </div>
 
-                <div className="flex flex-col items-end shrink-0 gap-1">
-                  <span className="font-mono text-xs text-[#94a3b8]">
-                    {cred.year}
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#5eead4]/10 text-[#5eead4] font-mono text-[11px] font-medium border border-[#5eead4]/20">
-                    {cred.category}
-                  </span>
+                  {/* Skills */}
+                  {cred.skills && cred.skills.length > 0 && (
+                    <ul className="mt-2 flex flex-wrap" aria-label="Skills covered">
+                      {cred.skills.map((skill) => (
+                        <li key={skill} className="mr-1.5 mt-2">
+                          <div className="flex items-center rounded-full bg-teal-400/10 px-3 py-1 text-xs font-medium leading-5 text-teal-300">
+                            {skill}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
-            </button>
+            </li>
           ))}
-        </div>
-
-        {/* View All Credentials Link */}
-        <div className="mt-4">
-          <a
-            href="https://linkedin.com/in/natanyidnekachew"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 font-mono text-sm text-[#e2e8f0] hover:text-[#5eead4] transition-colors duration-200 group"
-          >
-            <span>View All Credentials</span>
-            <span className="material-symbols-outlined text-[18px] transform group-hover:translate-x-1 transition-transform duration-200">
-              arrow_forward
-            </span>
-          </a>
-        </div>
+        </ol>
       </div>
 
-      {/* Modal / Lightbox for Credential Inspection */}
+      {/* Verification Modal dialog */}
       {selectedCert && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-labelledby="modal-cert-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
           onClick={() => setSelectedCert(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-[#060e20]/85 backdrop-blur-md transition-opacity duration-300"
         >
           <div
+            className="relative w-full max-w-lg rounded-lg border border-slate-700 bg-slate-900 p-6 text-slate-300 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-2xl bg-[#171f33] rounded-2xl border border-[#5eead4]/30 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
           >
-            {/* Modal Ambient Glow Top */}
-            <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[#5eead4]/15 via-transparent to-transparent pointer-events-none" />
-
-            {/* Header bar */}
-            <div className="relative px-6 pt-5 pb-3 flex items-center justify-between border-b border-[#222a3d] shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#5eead4] animate-ping" />
-                <span className="font-mono text-xs uppercase tracking-widest text-[#5eead4] font-medium">
-                  Official Credential Inspection
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="font-mono text-xs uppercase tracking-wider text-teal-300">
+                  {selectedCert.issuer}
                 </span>
+                <h3 className="text-xl font-bold text-slate-100 mt-1">
+                  {selectedCert.title}
+                </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedCert(null)}
+                className="text-slate-400 hover:text-slate-100 p-1 rounded-md"
                 aria-label="Close modal"
-                className="p-1.5 rounded-lg text-[#94a3b8] hover:text-[#e2e8f0] hover:bg-[#222a3d] transition-colors"
               >
-                <span className="material-symbols-outlined text-[22px]">close</span>
+                ✕
               </button>
             </div>
 
-            {/* Scrollable Content Body */}
-            <div className="overflow-y-auto p-6 space-y-5">
-              {/* Certificate Document Badge Preview Card */}
-              <div className="p-5 rounded-xl bg-[#131b2e] border border-[#222a3d] relative overflow-hidden">
-                <div className="absolute -right-8 -bottom-8 opacity-5 text-[#5eead4] pointer-events-none">
-                  <span className="material-symbols-outlined text-[180px]">
-                    verified
-                  </span>
-                </div>
+            <p className="mt-4 text-sm leading-relaxed text-slate-400">
+              {selectedCert.description}
+            </p>
 
-                <div className="flex items-start justify-between gap-4 relative z-10">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-[#5eead4]/15 border border-[#5eead4]/30 flex items-center justify-center text-[#5eead4] shrink-0">
-                      <span className="material-symbols-outlined text-[28px]">
-                        {selectedCert.icon}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-mono text-xs uppercase tracking-wider text-[#5eead4] font-medium">
-                        {selectedCert.issuer}
-                      </span>
-                      <h2
-                        id="modal-cert-title"
-                        className="text-lg md:text-xl text-[#e2e8f0] font-bold leading-tight mt-0.5"
-                      >
-                        {selectedCert.title}
-                      </h2>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0 text-right">
-                    <span className="inline-flex items-center gap-1 font-mono text-xs px-2.5 py-1 rounded-full bg-[#5eead4]/10 border border-[#5eead4]/30 text-[#5eead4] font-semibold">
-                      <span className="material-symbols-outlined text-[14px]">
-                        check_circle
-                      </span>
-                      {selectedCert.status}
-                    </span>
-                  </div>
-                </div>
-
-                <p className="mt-4 text-xs md:text-sm text-[#bbcac5] leading-relaxed border-t border-[#222a3d] pt-3">
-                  {selectedCert.description}
-                </p>
-              </div>
-
-              {/* Structured Metadata Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3 rounded-lg bg-[#131b2e]/70 border border-[#222a3d]">
-                  <span className="font-mono text-[11px] text-[#94a3b8] block">
-                    Credential ID
-                  </span>
-                  <span className="font-mono text-xs text-[#e2e8f0] font-medium tracking-wide mt-0.5 block truncate">
-                    {selectedCert.code}
-                  </span>
-                </div>
-                <div className="p-3 rounded-lg bg-[#131b2e]/70 border border-[#222a3d]">
-                  <span className="font-mono text-[11px] text-[#94a3b8] block">
-                    Issued
-                  </span>
-                  <span className="font-mono text-xs text-[#e2e8f0] font-medium mt-0.5 block">
-                    {selectedCert.date}
-                  </span>
-                </div>
-                <div className="p-3 rounded-lg bg-[#131b2e]/70 border border-[#222a3d]">
-                  <span className="font-mono text-[11px] text-[#94a3b8] block">
-                    Validity
-                  </span>
-                  <span className="font-mono text-xs text-[#5eead4] font-medium mt-0.5 block">
-                    {selectedCert.validity}
-                  </span>
-                </div>
-                <div className="p-3 rounded-lg bg-[#131b2e]/70 border border-[#222a3d]">
-                  <span className="font-mono text-[11px] text-[#94a3b8] block">
-                    Domain Track
-                  </span>
-                  <span className="font-mono text-xs text-[#e2e8f0] font-medium mt-0.5 block truncate">
-                    {selectedCert.track}
-                  </span>
-                </div>
-              </div>
-
-              {/* Verified Competencies */}
+            <div className="mt-5 pt-4 border-t border-slate-800 grid grid-cols-2 gap-3 text-xs font-mono">
               <div>
-                <span className="font-mono text-xs uppercase tracking-wider text-[#94a3b8] block mb-2">
-                  Verified Competencies &amp; Syllabi
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedCert.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-2.5 py-1 rounded-full bg-[#222a3d] border border-[#2d3449] text-[#e2e8f0] font-mono text-xs"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
+                <span className="text-slate-500 block">Credential ID:</span>
+                <span className="text-slate-300 font-semibold">{selectedCert.code || "Verified"}</span>
+              </div>
+              <div>
+                <span className="text-slate-500 block">Issued:</span>
+                <span className="text-slate-300">{selectedCert.date || selectedCert.year}</span>
+              </div>
+              <div>
+                <span className="text-slate-500 block">Validity:</span>
+                <span className="text-slate-300">{selectedCert.validity || "Lifetime"}</span>
+              </div>
+              <div>
+                <span className="text-slate-500 block">Status:</span>
+                <span className="text-teal-300">{selectedCert.status || "Active"}</span>
               </div>
             </div>
 
-            {/* Modal Actions Footer */}
-            <div className="px-6 py-4 border-t border-[#222a3d] bg-[#131b2e]/80 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
-              <span className="font-mono text-xs text-[#859490] hidden sm:flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[15px] text-[#5eead4]">
-                  lock
-                </span>
-                Cryptographically signed &amp; authenticated registry
-              </span>
-              <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <button
-                  type="button"
-                  onClick={() => setSelectedCert(null)}
-                  className="px-4 py-2 rounded-lg font-mono text-xs text-[#94a3b8] hover:text-[#e2e8f0] hover:bg-[#222a3d] transition-colors"
-                >
-                  Close (Esc)
-                </button>
+            {selectedCert.verify_url && (
+              <div className="mt-6">
                 <a
                   href={selectedCert.verify_url}
                   target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-lg font-mono text-xs font-semibold bg-[#5eead4] text-[#00675b] hover:bg-[#b5fff0] transition-all duration-200 inline-flex items-center gap-1.5 shadow-lg shadow-[#5eead4]/20 hover:shadow-[#5eead4]/40"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-1.5 font-medium text-sm text-teal-300 hover:text-teal-200"
                 >
-                  <span>Verify on Official Registry</span>
-                  <span className="material-symbols-outlined text-[16px]">
-                    arrow_outward
-                  </span>
+                  <span>Verify Credential</span>
+                  <Arrow external />
                 </a>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}

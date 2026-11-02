@@ -10,14 +10,14 @@ import type {
   CertificationData,
   SkillCategoryData,
   ArticleData,
-  PhilosophyData,
+  TestimonialData,
 } from "@/lib/portfolio";
 import AboutModule from "./cms/modules/AboutModule";
 import ProjectsModule from "./cms/modules/ProjectsModule";
 import ExperienceModule from "./cms/modules/ExperienceModule";
 import CertificationsModule from "./cms/modules/CertificationsModule";
 import SkillsModule from "./cms/modules/SkillsModule";
-import PhilosophyModule from "./cms/modules/PhilosophyModule";
+import TestimonialsModule from "./cms/modules/TestimonialsModule";
 import type { CMSTab } from "./cms/types";
 
 interface CMSClientProps {
@@ -27,7 +27,7 @@ interface CMSClientProps {
   initialCertifications: CertificationData[];
   initialSkillCategories: SkillCategoryData[];
   initialArticles: ArticleData[];
-  initialPhilosophy: PhilosophyData;
+  initialTestimonials?: TestimonialData[];
 }
 
 export default function CMSClient({
@@ -37,10 +37,11 @@ export default function CMSClient({
   initialCertifications,
   initialSkillCategories,
   initialArticles,
-  initialPhilosophy,
+  initialTestimonials = [],
 }: CMSClientProps) {
   // Navigation tab state
-  const [activeTab, setActiveTab] = useState<CMSTab>("skills");
+  const [activeTab, setActiveTab] = useState<CMSTab>("about");
+  const [testimonialsList, setTestimonialsList] = useState<TestimonialData[]>(initialTestimonials);
 
   // About form state
   const [aboutData, setAboutData] = useState<AboutData>(initialAbout);
@@ -143,9 +144,7 @@ export default function CMSClient({
   });
   const [isSavingArticles, setIsSavingArticles] = useState(false);
 
-  // Philosophy state
-  const [philosophyForm, setPhilosophyForm] = useState<PhilosophyData>(initialPhilosophy);
-  const [isSavingPhilosophy, setIsSavingPhilosophy] = useState(false);
+
 
   // Toast
   const [toast, setToast] = useState<{
@@ -252,6 +251,18 @@ export default function CMSClient({
     }
   };
 
+  const refreshTestimonials = async () => {
+    try {
+      const res = await fetch("/api/cms/testimonials");
+      const data = await res.json();
+      if (data.success) {
+        setTestimonialsList(data.data);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
   // -------------------------------------------------------------
   // WRITING & ARTICLES HANDLERS
   // -------------------------------------------------------------
@@ -305,35 +316,7 @@ export default function CMSClient({
     }
   };
 
-  // -------------------------------------------------------------
-  // PHILOSOPHY & PARAGRAPH HANDLERS
-  // -------------------------------------------------------------
-  const handleSavePhilosophy = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSavingPhilosophy(true);
-    setToast(null);
 
-    try {
-      const res = await fetch("/api/cms/philosophy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(philosophyForm),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setToast({
-          type: "success",
-          text: "Philosophy principles & colophon saved to SQLite!",
-        });
-      } else {
-        setToast({ type: "error", text: data.error || "Failed to save philosophy." });
-      }
-    } catch {
-      setToast({ type: "error", text: "Server error saving philosophy." });
-    } finally {
-      setIsSavingPhilosophy(false);
-    }
-  };
 
   // -------------------------------------------------------------
   // CERTIFICATIONS HANDLERS
@@ -716,26 +699,22 @@ export default function CMSClient({
   const currentSaveHandler =
     activeTab === "skills"
       ? (e: any) => e.preventDefault()
-      : activeTab === "philosophy"
-        ? handleSavePhilosophy
-        : activeTab === "certifications"
-          ? handleSaveCert
-          : activeTab === "experience"
-            ? handleSaveExperience
-            : activeTab === "projects"
-              ? handleSaveProject
-              : handleSaveAbout;
+      : activeTab === "certifications"
+        ? handleSaveCert
+        : activeTab === "experience"
+          ? handleSaveExperience
+          : activeTab === "projects"
+            ? handleSaveProject
+            : handleSaveAbout;
 
   const currentSaveLoading =
-    activeTab === "philosophy"
-      ? isSavingPhilosophy
-      : activeTab === "certifications"
-        ? isSavingCert
-        : activeTab === "experience"
-          ? isSavingExperience
-          : activeTab === "projects"
-            ? isSavingProject
-            : isSavingAbout;
+    activeTab === "certifications"
+      ? isSavingCert
+      : activeTab === "experience"
+        ? isSavingExperience
+        : activeTab === "projects"
+          ? isSavingProject
+          : isSavingAbout;
 
   return (
     <div className="min-h-screen bg-[#0b1326] text-[#dae2fd] font-sans antialiased flex flex-col selection:bg-[#5eead4] selection:text-[#00675b]">
@@ -807,21 +786,7 @@ export default function CMSClient({
               <span className="whitespace-nowrap">About Section</span>
             </button>
 
-            {/* Philosophy Tab — headline next to About tab: 2nd */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("philosophy");
-                setToast(null);
-              }}
-              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${activeTab === "philosophy"
-                ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
-                : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
-                }`}
-            >
-              <span className="material-symbols-outlined text-[16px] shrink-0">psychology</span>
-              <span className="whitespace-nowrap">Philosophy</span>
-            </button>
+
 
             {/* Projects Tab — matches portfolio order: 3rd */}
             <button
@@ -871,7 +836,7 @@ export default function CMSClient({
               <span className="whitespace-nowrap">Certifications ({certificationsList.length})</span>
             </button>
 
-            {/* Technical Arsenal & Writing Tab — matches portfolio order: 6th */}
+            {/* Technical Arsenal & Writing Tab */}
             <button
               type="button"
               onClick={() => {
@@ -885,6 +850,30 @@ export default function CMSClient({
             >
               <span className="material-symbols-outlined text-[16px] shrink-0">memory</span>
               <span className="whitespace-nowrap">Technical Arsenal</span>
+            </button>
+
+            {/* Testimonials Review Tab */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("testimonials");
+                setToast(null);
+                refreshTestimonials();
+              }}
+              className={`px-3.5 py-2 rounded-xl font-mono text-xs transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${activeTab === "testimonials"
+                ? "bg-[#1d273d] text-[#5eead4] font-medium shadow-[0_2px_12px_rgba(0,0,0,0.3)] border border-[#5eead4]/40"
+                : "text-[#bbcac5] hover:text-[#dae2fd] hover:bg-[#131b2e]/70 border border-transparent"
+                }`}
+            >
+              <span className="material-symbols-outlined text-[16px] shrink-0">rate_review</span>
+              <span className="whitespace-nowrap">
+                Testimonials Review ({testimonialsList.length})
+              </span>
+              {testimonialsList.filter((t) => t.status === "pending").length > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold">
+                  {testimonialsList.filter((t) => t.status === "pending").length} new
+                </span>
+              )}
             </button>
           </nav>
 
@@ -1024,12 +1013,13 @@ export default function CMSClient({
           />
         )}
 
-        {activeTab === "philosophy" && (
-          <PhilosophyModule
-            philosophyForm={philosophyForm}
-            isSaving={isSavingPhilosophy}
-            onChangeForm={setPhilosophyForm}
-            onSubmit={handleSavePhilosophy}
+
+
+        {activeTab === "testimonials" && (
+          <TestimonialsModule
+            testimonials={testimonialsList}
+            onRefresh={refreshTestimonials}
+            setToast={setToast}
           />
         )}
       </main>

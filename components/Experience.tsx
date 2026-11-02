@@ -1,4 +1,5 @@
 import type { ExperienceData } from "@/lib/portfolio";
+import { Arrow } from "./Arrow";
 
 interface ExperienceProps {
   experiences: ExperienceData[];
@@ -9,83 +10,101 @@ export default function Experience({ experiences, resumeUrl }: ExperienceProps) 
   return (
     <section
       id="experience"
-      aria-label="Work experience"
-      className="mb-16 md:mb-24 scroll-mt-16 lg:scroll-mt-24"
+      aria-label="Experience"
+      className="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24"
     >
-      {/* Mobile Sticky Section Header */}
-      <div className="sticky top-0 z-20 -mx-6 px-6 py-4 backdrop-blur-md bg-[#0b1326]/80 lg:relative lg:top-auto lg:mx-0 lg:px-0 lg:py-0 lg:backdrop-blur-none lg:bg-transparent">
-        <h2 className="text-sm uppercase tracking-widest text-[#e2e8f0] font-bold lg:sr-only flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#5eead4] inline-block"></span>
+      {/* Sticky Mobile Header */}
+      <div className="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">
           Experience
         </h2>
       </div>
 
-      <div className="mt-4 lg:mt-0 flex flex-col gap-6">
-        {experiences.map((exp) => (
-          <div
-            key={exp.id}
-            className="group relative rounded-xl p-6 bg-[#171f33]/30 hover:bg-[#171f33]/80 border border-[#2d3449]/40 hover:border-[#5eead4]/30 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-0.5"
-          >
-            <div className="flex flex-col sm:flex-row sm:gap-6">
-              {/* Timeline Header */}
-              <header className="sm:w-1/4 mb-1 sm:mb-0 shrink-0">
-                <span className="font-mono text-xs uppercase tracking-wider text-[#94a3b8] font-medium">
-                  {exp.period}
-                </span>
-              </header>
+      <div>
+        <ol className="group/list">
+          {experiences.map((exp) => (
+            <li key={exp.id} className="mb-12">
+              <div className="group relative grid pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+                {/* Hover spotlight card backdrop */}
+                <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition motion-reduce:transition-none lg:-inset-x-6 lg:block lg:group-hover:bg-slate-800/50 lg:group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] lg:group-hover:drop-shadow-lg" />
 
-              {/* Content */}
-              <div className="sm:w-3/4">
-                <h3 className="text-lg font-semibold text-[#e2e8f0] flex items-center gap-1 group-hover:text-[#5eead4] transition-colors duration-200">
-                  <span>
-                    {exp.role} · {exp.company}
-                  </span>
-                  <span className="material-symbols-outlined text-[18px] transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-200 text-[#94a3b8] group-hover:text-[#5eead4]">
-                    arrow_outward
-                  </span>
-                </h3>
-
-                <p className="font-mono text-xs text-[#94a3b8] mt-0.5">
-                  {exp.tagline}
-                </p>
-
-                <p className="mt-3 text-sm text-[#bbcac5] leading-relaxed">
-                  {exp.description}
-                </p>
-
-                {/* Tech Pills from SQLite DB */}
-                <ul
-                  aria-label="Technologies used"
-                  className="mt-4 flex flex-wrap gap-1.5"
+                {/* Period / Timeline Date */}
+                <header
+                  className="z-10 mb-2 mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:col-span-2"
+                  aria-label={exp.period}
                 >
-                  {exp.skills.map((skill) => (
-                    <li
-                      key={skill}
-                      className="px-3 py-1 rounded-full bg-[#5eead4]/10 text-[#5eead4] border border-[#5eead4]/20 font-mono text-xs font-medium"
-                    >
-                      {skill}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+                  {exp.period}
+                </header>
 
-      {/* Résumé / CV Link */}
-      <div className="mt-8">
-        <a
-          href={resumeUrl}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="inline-flex items-center gap-2 font-mono text-sm text-[#e2e8f0] hover:text-[#5eead4] transition-colors duration-200 group"
-        >
-          <span className="font-medium">View Full Résumé / CV</span>
-          <span className="material-symbols-outlined text-[18px] transform group-hover:translate-x-1 transition-transform duration-200">
-            arrow_forward
-          </span>
-        </a>
+                {/* Content */}
+                <div className="z-10 sm:col-span-6">
+                  <h3 className="font-medium leading-snug text-slate-200">
+                    <div>
+                      <a
+                        className="inline-flex items-baseline font-medium leading-tight text-slate-200 hover:text-teal-300 focus-visible:text-teal-300 group/link text-base"
+                        href={exp.company_url || "#"}
+                        target={exp.company_url ? "_blank" : undefined}
+                        rel={exp.company_url ? "noreferrer noopener" : undefined}
+                        aria-label={`${exp.role} at ${exp.company} (opens in a new tab)`}
+                      >
+                        <span className="absolute -inset-x-4 -inset-y-2.5 hidden rounded md:-inset-x-6 md:-inset-y-4 lg:block" />
+                        <span>
+                          {exp.role} ·{" "}
+                          <span className="inline-block">
+                            {exp.company}
+                            {exp.company_url && <Arrow external />}
+                          </span>
+                        </span>
+                      </a>
+                    </div>
+                  </h3>
+
+                  {exp.tagline && (
+                    <div className="text-xs font-mono text-slate-500 mt-1" aria-hidden="true">
+                      {exp.tagline}
+                    </div>
+                  )}
+
+                  <p className="mt-2 text-sm leading-normal text-slate-400">
+                    {exp.description}
+                  </p>
+
+                  {/* Skills / Technology Pills */}
+                  {exp.skills && exp.skills.length > 0 && (
+                    <ul className="mt-2 flex flex-wrap" aria-label="Technologies used">
+                      {exp.skills.map((skill) => (
+                        <li key={skill} className="mr-1.5 mt-2">
+                          <div className="flex items-center rounded-full bg-teal-400/10 px-3 py-1 text-xs font-medium leading-5 text-teal-300">
+                            {skill}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        {/* View Full Résumé Link */}
+        <div className="mt-12">
+          <a
+            className="inline-flex items-baseline font-medium leading-tight text-slate-200 hover:text-teal-300 focus-visible:text-teal-300 font-semibold group/link text-base"
+            href={resumeUrl || "/resume.pdf"}
+            target="_blank"
+            rel="noreferrer noopener"
+            aria-label="View Full Résumé (opens in a new tab)"
+          >
+            <span>
+              View Full{" "}
+              <span className="inline-block">
+                Résumé
+                <Arrow external />
+              </span>
+            </span>
+          </a>
+        </div>
       </div>
     </section>
   );

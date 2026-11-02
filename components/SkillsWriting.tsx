@@ -1,4 +1,5 @@
 import type { SkillCategoryData, ArticleData } from "@/lib/portfolio";
+import { Arrow } from "./Arrow";
 
 interface SkillsWritingProps {
   skillCategories: SkillCategoryData[];
@@ -12,116 +13,99 @@ export default function SkillsWriting({
   return (
     <section
       id="writing"
-      aria-label="Skills and Technical Writing"
-      className="mb-16 md:mb-24 scroll-mt-16 lg:scroll-mt-24"
+      aria-label="Writing and technical arsenal"
+      className="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24"
     >
-      {/* Mobile Sticky Section Header */}
-      <div className="sticky top-0 z-20 -mx-6 px-6 py-4 backdrop-blur-md bg-[#0b1326]/80 lg:relative lg:top-auto lg:mx-0 lg:px-0 lg:py-0 lg:backdrop-blur-none lg:bg-transparent">
-        <h2 className="text-sm uppercase tracking-widest text-[#e2e8f0] font-bold lg:sr-only flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#5eead4] inline-block"></span>
-          Skills &amp; Writing
+      {/* Sticky Mobile Header */}
+      <div className="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">
+          Writing &amp; Skills
         </h2>
       </div>
 
-      <div className="mt-4 lg:mt-0 space-y-6">
-        {/* Technical Arsenal Card from SQLite DB */}
-        <div className="p-6 rounded-xl bg-[#171f33]/30 border border-[#2d3449]/40 shadow-sm space-y-6">
-          <h3 className="text-lg font-semibold text-[#e2e8f0] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#5eead4] text-[20px]">
-              terminal
-            </span>
-            <span>Technical Arsenal</span>
-          </h3>
+      {/* Writing list */}
+      {articles && articles.length > 0 && (
+        <div className="mb-14">
+          <ul className="group/list">
+            {articles.map((article) => (
+              <li key={article.id} className="mb-10">
+                <div className="group relative grid pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+                  {/* Spotlight background */}
+                  <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition motion-reduce:transition-none lg:-inset-x-6 lg:block lg:group-hover:bg-slate-800/50 lg:group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] lg:group-hover:drop-shadow-lg" />
 
-          <div className="space-y-4">
-            {skillCategories.map((category) => (
-              <div key={category.id}>
-                <span className="font-mono text-[11px] uppercase tracking-widest text-[#94a3b8] block mb-2">
-                  {category.title}
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {category.skills.map((skill) => {
-                    const isArchitecture = category.title === "System Architecture";
-                    return (
-                      <span
-                        key={skill}
-                        className={`px-3 py-1 rounded-full font-mono text-xs transition-colors ${
-                          isArchitecture
-                            ? "bg-[#5eead4]/10 text-[#5eead4] border border-[#5eead4]/25 font-medium"
-                            : "bg-[#222a3d] text-[#e2e8f0] border border-[#2d3449]/70 hover:border-[#5eead4]/40"
-                        }`}
-                      >
-                        {skill}
-                      </span>
-                    );
-                  })}
+                  {/* Year header */}
+                  <header
+                    className="z-10 mb-2 mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:col-span-2"
+                    aria-label={article.year}
+                  >
+                    {article.year}
+                  </header>
+
+                  {/* Title & info */}
+                  <div className="z-10 sm:col-span-6">
+                    <h3 className="font-medium leading-snug text-slate-200">
+                      <div>
+                        <a
+                          className="inline-flex items-baseline font-medium leading-tight text-slate-200 hover:text-teal-300 focus-visible:text-teal-300 group/link text-base"
+                          href={article.url}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          aria-label={`${article.title} (opens in a new tab)`}
+                        >
+                          <span className="absolute -inset-x-4 -inset-y-2.5 hidden rounded md:-inset-x-6 md:-inset-y-4 lg:block" />
+                          <span>
+                            {article.title}{" "}
+                            <span className="inline-block">
+                              <Arrow external />
+                            </span>
+                          </span>
+                        </a>
+                      </div>
+                    </h3>
+
+                    <div className="mt-2 flex items-center gap-2 text-xs font-mono text-slate-500">
+                      <span>{article.publication}</span>
+                      {article.read_time && (
+                        <>
+                          <span>·</span>
+                          <span>{article.read_time}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Technical Arsenal skills tags grouped by category */}
+      {skillCategories && skillCategories.length > 0 && (
+        <div className="pt-4 border-t border-slate-800/80">
+          <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500 mb-6">
+            Technical Arsenal
+          </h3>
+          <div className="space-y-5">
+            {skillCategories.map((cat) => (
+              <div key={cat.id}>
+                <span className="text-xs font-mono text-slate-400 block mb-2 font-medium">
+                  {cat.title}
+                </span>
+                <ul className="flex flex-wrap" aria-label={`Skills in ${cat.title}`}>
+                  {cat.skills.map((skill) => (
+                    <li key={skill} className="mr-1.5 mt-2">
+                      <div className="flex items-center rounded-full bg-teal-400/10 px-3 py-1 text-xs font-medium leading-5 text-teal-300">
+                        {skill}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
         </div>
-
-        {/* Selected Technical Writing from SQLite DB */}
-        <div className="p-6 rounded-xl bg-[#171f33]/30 border border-[#2d3449]/40 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-[#e2e8f0] flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#5eead4] text-[20px]">
-                article
-              </span>
-              <span>Technical Writing &amp; Publications</span>
-            </h3>
-            <span className="font-mono text-xs text-[#94a3b8] flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#5eead4]"></span>
-              Substack
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            {articles.map((art) => (
-              <a
-                key={art.id}
-                href={art.url}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="group block p-3.5 rounded-lg bg-[#131b2e]/60 hover:bg-[#171f33] border border-[#2d3449]/40 hover:border-[#5eead4]/30 transition-all duration-200"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h4 className="text-sm md:text-base font-medium text-[#e2e8f0] group-hover:text-[#5eead4] transition-colors flex items-center gap-1">
-                      <span>{art.title}</span>
-                      <span className="material-symbols-outlined text-[16px] transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform text-[#94a3b8] group-hover:text-[#5eead4]">
-                        arrow_outward
-                      </span>
-                    </h4>
-                    <p className="font-mono text-xs text-[#94a3b8] mt-1 flex items-center gap-2">
-                      <span>{art.publication}</span>
-                      <span className="w-1 h-1 rounded-full bg-[#94a3b8]/50"></span>
-                      <span>{art.read_time}</span>
-                    </p>
-                  </div>
-                  <span className="font-mono text-xs text-[#94a3b8] shrink-0">
-                    {art.year}
-                  </span>
-                </div>
-              </a>
-            ))}
-          </div>
-
-          <div className="pt-2">
-            <a
-              href="https://cipherwizard.substack.com"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="inline-flex items-center gap-1.5 font-mono text-sm text-[#e2e8f0] hover:text-[#5eead4] transition-colors duration-200 group"
-            >
-              <span>Read on Substack</span>
-              <span className="material-symbols-outlined text-[18px] transform group-hover:translate-x-1 transition-transform duration-200">
-                arrow_forward
-              </span>
-            </a>
-          </div>
-        </div>
-      </div>
+      )}
     </section>
   );
 }

@@ -7,7 +7,7 @@ export type {
   CertificationData,
   SkillCategoryData,
   ArticleData,
-  PhilosophyData,
+  TestimonialData,
 } from "@/lib/portfolio";
 
 export type CMSTab =
@@ -16,7 +16,7 @@ export type CMSTab =
   | "experience"
   | "certifications"
   | "skills"
-  | "philosophy";
+  | "testimonials";
 
 export interface Toast {
   type: "success" | "error";

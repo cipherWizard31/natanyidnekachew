@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import type { ProfileData, SocialLinkData } from "@/lib/portfolio";
+import { SocialIcon } from "./SocialIcon";
 
 interface NavItem {
   id: string;
@@ -11,10 +11,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { id: "about", label: "About" },
-  { id: "projects", label: "Projects" },
   { id: "experience", label: "Experience" },
+  { id: "projects", label: "Projects" },
   { id: "certifications", label: "Certifications" },
-  { id: "writing", label: "Skills & Writing" },
+  { id: "testimonials", label: "Testimonials" },
 ];
 
 interface SidebarProps {
@@ -26,38 +26,24 @@ export default function Sidebar({ profile, socialLinks }: SidebarProps) {
   const [activeSection, setActiveSection] = useState<string>("about");
 
   useEffect(() => {
-    const handleScroll = () => {
-      // If user has scrolled to the bottom of the page, activate the last section
-      const isAtBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 60;
-
-      if (isAtBottom) {
-        setActiveSection(navItems[navItems.length - 1].id);
-        return;
-      }
-
-      // Check section bounding rects relative to viewport
-      const threshold = window.innerHeight * 0.35;
-      let currentSection = navItems[0].id;
-
-      for (const item of navItems) {
-        const el = document.getElementById(item.id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= threshold) {
-            currentSection = item.id;
-          }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) {
+          setActiveSection(visible[0].target.id);
         }
-      }
+      },
+      { rootMargin: "-10% 0px -55% 0px", threshold: 0 }
+    );
 
-      setActiveSection(currentSection);
-    };
+    navItems.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => observer.disconnect();
   }, []);
 
   const handleNavClick = (
@@ -77,50 +63,44 @@ export default function Sidebar({ profile, socialLinks }: SidebarProps) {
   };
 
   return (
-    <header className="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/2 lg:flex-col lg:justify-between lg:py-16 pt-10 pb-8">
-      <div className="flex flex-col">
-        {/* Name and Tagline from SQLite DB */}
-        <div>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#dae2fd]">
-            <a
-              href="#"
-              className="hover:text-[#b5fff0] transition-colors duration-200"
-            >
-              {profile.name}
-            </a>
-          </h1>
-          <h2 className="mt-3 text-lg sm:text-xl font-medium tracking-tight text-[#b5fff0]">
-            {profile.title}
-          </h2>
-          <p className="mt-4 max-w-xs text-sm leading-normal text-[#94a3b8]">
-            {profile.summary}
-          </p>
-        </div>
+    <header className="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-[48%] lg:flex-col lg:justify-between lg:py-24">
+      <div>
+        {/* Name, Title & Tagline */}
+        <h1 className="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">
+          <a href="/">{profile.name}</a>
+        </h1>
+        <h2 className="mt-3 text-lg font-medium tracking-tight text-slate-200 sm:text-xl">
+          {profile.title}
+        </h2>
+        <p className="mt-4 max-w-xs leading-normal text-slate-400">
+          {profile.summary}
+        </p>
 
-        {/* Navigation */}
-        <nav className="hidden lg:block mt-16" aria-label="In-page navigation">
-          <ul className="flex flex-col gap-4">
+        {/* Navigation Indicator & Jump Links */}
+        <nav className="nav hidden lg:block" aria-label="In-page jump links">
+          <ul className="mt-16 w-max">
             {navItems.map((item) => {
               const isActive = activeSection === item.id;
               return (
-                <li key={item.id} className="group">
+                <li key={item.id}>
                   <a
+                    className={`group flex items-center py-3 ${isActive ? "active text-slate-200" : ""
+                      }`}
                     href={`#${item.id}`}
                     onClick={(e) => handleNavClick(e, item.id)}
-                    className={`flex items-center py-1 transition-all duration-200 ${
-                      isActive
-                        ? "text-[#b5fff0] font-semibold"
-                        : "text-[#bbcac5] hover:text-[#b5fff0]"
-                    }`}
                   >
                     <span
-                      className={`mr-4 h-px transition-all duration-200 ${
-                        isActive
-                          ? "w-16 bg-[#b5fff0]"
-                          : "w-8 bg-[#859490]/50 group-hover:w-16 group-hover:bg-[#b5fff0]"
-                      }`}
+                      className={`nav-indicator mr-4 h-px transition-all motion-reduce:transition-none ${isActive
+                          ? "w-16 bg-slate-200"
+                          : "w-8 bg-slate-600 group-hover:w-16 group-hover:bg-slate-200 group-focus-visible:w-16 group-focus-visible:bg-slate-200"
+                        }`}
                     />
-                    <span className="font-mono text-xs tracking-widest uppercase">
+                    <span
+                      className={`nav-text text-xs font-bold uppercase tracking-widest ${isActive
+                          ? "text-slate-200"
+                          : "text-slate-500 group-hover:text-slate-200 group-focus-visible:text-slate-200"
+                        }`}
+                    >
                       {item.label}
                     </span>
                   </a>
@@ -131,43 +111,24 @@ export default function Sidebar({ profile, socialLinks }: SidebarProps) {
         </nav>
       </div>
 
-      {/* Social links & Profile Avatar from DB */}
-      <div className="mt-10 lg:mt-0 flex items-center justify-between">
-        <ul aria-label="Social and contact links" className="flex items-center gap-5">
-          {socialLinks.map((social) => (
-            <li key={social.id}>
-              <a
-                href={social.href}
-                aria-label={social.label}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="block text-[#94a3b8] hover:text-[#b5fff0] transition-colors duration-200"
-              >
-                <span className="material-symbols-outlined text-[22px] leading-none align-middle">
-                  {social.icon}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        {/* Profile Avatar using DB image URL */}
-        <div className="relative w-9 h-9 rounded-full overflow-hidden border border-[#5eead4]/40 bg-[#171f33] shadow-inner flex items-center justify-center">
-          <Image
-            src={profile.avatar_url}
-            alt={profile.name}
-            width={36}
-            height={36}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.currentTarget as HTMLElement).style.display = "none";
-            }}
-          />
-          <span className="material-symbols-outlined text-[#003730] text-[18px] absolute pointer-events-none -z-10">
-            person
-          </span>
-        </div>
-      </div>
+      {/* Social Links */}
+      <ul className="ml-1 mt-8 flex items-center" aria-label="Social media">
+        {socialLinks.map((social) => (
+          <li key={social.id} className="mr-5 shrink-0 text-xs">
+            <a
+              className="block text-slate-400 hover:text-slate-200 transition-colors"
+              href={social.href}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label={`${social.label || social.name} (opens in a new tab)`}
+              title={social.label || social.name}
+            >
+              <span className="sr-only">{social.label || social.name}</span>
+              <SocialIcon name={social.name} className="h-6 w-6" />
+            </a>
+          </li>
+        ))}
+      </ul>
     </header>
   );
 }

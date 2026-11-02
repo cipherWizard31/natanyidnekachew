@@ -1,6 +1,6 @@
 "use client";
 
-import type { PhilosophyData } from "../types";
+import type { PhilosophyData } from "@/lib/portfolio";
 
 interface Props {
   philosophyForm: PhilosophyData;

@@ -1,4 +1,4 @@
-import { getPortfolioData } from "@/lib/portfolio";
+import { getPortfolioData, getAllTestimonials } from "@/lib/portfolio";
 import CMSClient from "@/components/CMSClient";
 
 export const metadata = {
@@ -11,6 +11,7 @@ export const metadata = {
 
 export default function CMSPage() {
   const data = getPortfolioData();
+  const allTestimonials = getAllTestimonials();
 
   return (
     <CMSClient
@@ -20,7 +21,7 @@ export default function CMSPage() {
       initialCertifications={data.certifications}
       initialSkillCategories={data.skillCategories}
       initialArticles={data.articles}
-      initialPhilosophy={data.philosophy}
+      initialTestimonials={allTestimonials}
     />
   );
 }
