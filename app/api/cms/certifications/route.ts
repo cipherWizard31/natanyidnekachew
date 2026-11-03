@@ -28,11 +28,8 @@ export async function POST(req: Request) {
       title,
       issuer,
       icon,
-      code,
       year,
       date,
-      validity,
-      track,
       category,
       status,
       verify_url,
@@ -52,11 +49,8 @@ export async function POST(req: Request) {
         SET title = ?,
             issuer = ?,
             icon = ?,
-            code = ?,
             year = ?,
             date = ?,
-            validity = ?,
-            track = ?,
             category = ?,
             status = ?,
             verify_url = ?,
@@ -68,11 +62,8 @@ export async function POST(req: Request) {
         title,
         issuer,
         icon || "verified",
-        code,
         year,
         date || year,
-        validity || "Lifetime / Verified",
-        track || "Engineering",
         category || "Cloud",
         status || "Active & Verified",
         verify_url || "https://linkedin.com",
@@ -85,18 +76,15 @@ export async function POST(req: Request) {
       const newId = id || `cert-${Date.now()}`;
       db.prepare(`
         INSERT INTO certifications (
-          id, title, issuer, icon, code, year, date, validity, track, category, status, verify_url, description, skills, display_order
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          id, title, issuer, icon, year, date, category, status, verify_url, description, skills, display_order
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(
         newId,
         title,
         issuer,
         icon || "verified",
-        code,
         year,
         date || year,
-        validity || "Lifetime / Verified",
-        track || "Engineering",
         category || "Cloud",
         status || "Active & Verified",
         verify_url || "https://linkedin.com",

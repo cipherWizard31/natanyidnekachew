@@ -89,9 +89,6 @@ export default function TestimonialsModule({
             </span>
             <span>Testimonials &amp; Endorsement Reviews</span>
           </h2>
-          <p className="text-xs font-mono text-[#94a3b8] mt-1">
-            Review submissions sent from the website and approve them to display live.
-          </p>
         </div>
 
         {/* Status Filter Buttons */}
@@ -101,11 +98,10 @@ export default function TestimonialsModule({
               key={status}
               type="button"
               onClick={() => setFilter(status)}
-              className={`px-3 py-1.5 rounded-lg font-mono text-xs capitalize transition-all ${
-                filter === status
+              className={`px-3 py-1.5 rounded-lg font-mono text-xs capitalize transition-all ${filter === status
                   ? "bg-[#5eead4]/20 text-[#5eead4] border border-[#5eead4]/50 font-bold"
                   : "bg-[#0b1326] text-[#94a3b8] hover:text-[#dae2fd] border border-[#2d3449]"
-              }`}
+                }`}
             >
               {status}
               {status === "pending" && pendingCount > 0 && (
@@ -137,13 +133,12 @@ export default function TestimonialsModule({
             return (
               <div
                 key={t.id}
-                className={`p-6 rounded-2xl border transition-all ${
-                  isPending
+                className={`p-6 rounded-2xl border transition-all ${isPending
                     ? "bg-amber-950/10 border-amber-500/40 shadow-sm"
                     : isApproved
-                    ? "bg-[#171f33]/40 border-[#2d3449]/70"
-                    : "bg-red-950/10 border-red-900/30 opacity-75"
-                }`}
+                      ? "bg-[#171f33]/40 border-[#2d3449]/70"
+                      : "bg-red-950/10 border-red-900/30 opacity-75"
+                  }`}
               >
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                   <div className="space-y-2 flex-1">
@@ -155,13 +150,12 @@ export default function TestimonialsModule({
                         <h3 className="text-base font-semibold text-[#dae2fd] flex items-center gap-2">
                           <span>{t.name}</span>
                           <span
-                            className={`px-2 py-0.5 rounded-full font-mono text-[11px] uppercase font-bold ${
-                              isApproved
+                            className={`px-2 py-0.5 rounded-full font-mono text-[11px] uppercase font-bold ${isApproved
                                 ? "bg-teal-400/10 text-teal-300 border border-teal-400/30"
                                 : isPending
-                                ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
-                                : "bg-red-500/20 text-red-300 border border-red-500/30"
-                            }`}
+                                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                                  : "bg-red-500/20 text-red-300 border border-red-500/30"
+                              }`}
                           >
                             ● {t.status}
                           </span>

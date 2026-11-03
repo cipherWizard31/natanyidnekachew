@@ -179,11 +179,10 @@ export default function CMSAboutClient({ initialAbout }: CMSAboutClientProps) {
         {/* Status Toast Alert */}
         {statusMessage && (
           <div
-            className={`mb-6 p-4 rounded-xl font-mono text-xs flex items-center justify-between border ${
-              statusMessage.type === "success"
+            className={`mb-6 p-4 rounded-xl font-mono text-xs flex items-center justify-between border ${statusMessage.type === "success"
                 ? "bg-[#5eead4]/10 text-[#5eead4] border-[#5eead4]/30"
                 : "bg-red-950/40 text-red-300 border-red-800/40"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">
@@ -210,7 +209,6 @@ export default function CMSAboutClient({ initialAbout }: CMSAboutClientProps) {
                 </span>
                 <span>Real-Time Preview</span>
               </h2>
-              <span className="text-xs font-mono text-[#94a3b8]">Live Reflection</span>
             </div>
 
             <div className="p-6 rounded-2xl bg-[#171f33]/60 border border-[#2d3449]/60 shadow-lg space-y-4">

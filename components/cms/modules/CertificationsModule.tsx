@@ -49,7 +49,7 @@ export default function CertificationsModule({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors border border-[#5eead4]/30"
           >
             <span className="material-symbols-outlined text-[16px]">add</span>
-            <span>+ New Cert</span>
+            <span>New Cert</span>
           </button>
         </div>
 
@@ -60,11 +60,10 @@ export default function CertificationsModule({
               <div
                 key={cert.id}
                 onClick={() => onSelectCert(cert)}
-                className={`p-4 rounded-xl transition-all cursor-pointer border ${
-                  isSelected
-                    ? "bg-[#222a3d] border-[#5eead4]/40 shadow-[0_0_20px_-6px_rgba(94,234,212,0.15)]"
-                    : "bg-[#131b2e] border-[#2d3449]/40 hover:bg-[#171f33]"
-                }`}
+                className={`p-4 rounded-xl transition-all cursor-pointer border ${isSelected
+                  ? "bg-[#222a3d] border-[#5eead4]/40 shadow-[0_0_20px_-6px_rgba(94,234,212,0.15)]"
+                  : "bg-[#131b2e] border-[#2d3449]/40 hover:bg-[#171f33]"
+                  }`}
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
@@ -79,9 +78,8 @@ export default function CertificationsModule({
                 </div>
 
                 <h4
-                  className={`text-sm font-semibold transition-colors ${
-                    isSelected ? "text-[#5eead4]" : "text-[#dae2fd]"
-                  }`}
+                  className={`text-sm font-semibold transition-colors ${isSelected ? "text-[#5eead4]" : "text-[#dae2fd]"
+                    }`}
                 >
                   {cert.title}
                 </h4>
@@ -89,7 +87,7 @@ export default function CertificationsModule({
                 <p className="text-xs text-[#94a3b8] mt-0.5">{cert.issuer}</p>
 
                 <div className="flex items-center justify-between mt-3 text-xs font-mono text-[#94a3b8]">
-                  <span className="truncate max-w-[200px] text-[#859490]">{cert.code}</span>
+                  <span className="truncate max-w-[200px] text-[#859490]">{cert.issuer}</span>
                   {certificationsList.length > 1 && (
                     <button
                       type="button"
@@ -117,7 +115,7 @@ export default function CertificationsModule({
         <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
           <div>
             <span className="text-xs font-mono text-[#94a3b8]">
-              CREDENTIAL RECORD · {certForm.code || certForm.id}
+              CREDENTIAL RECORD · {certForm.id}
             </span>
             <h3 className="text-lg font-semibold text-[#dae2fd]">
               Edit: {certForm.title || "Untitled Credential"}
@@ -137,7 +135,7 @@ export default function CertificationsModule({
               disabled={isSaving}
               className="px-4 py-1.5 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-all disabled:opacity-50"
             >
-              {isSaving ? "Saving..." : "Save Credential"}
+              {isSaving ? "Saving..." : "Save"}
             </button>
           </div>
         </div>
@@ -168,17 +166,6 @@ export default function CertificationsModule({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-mono text-[#94a3b8] uppercase">Credential Serial / ID</label>
-            <input
-              type="text"
-              value={certForm.code}
-              onChange={(e) => onChangeForm((prev) => ({ ...prev, code: e.target.value }))}
-              required
-              className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-            />
-          </div>
-
-          <div className="space-y-1.5">
             <label className="text-xs font-mono text-[#94a3b8] uppercase">Year Issued</label>
             <input
               type="text"
@@ -196,28 +183,6 @@ export default function CertificationsModule({
               value={certForm.category}
               onChange={(e) => onChangeForm((prev) => ({ ...prev, category: e.target.value }))}
               className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#5eead4] focus:border-[#5eead4] focus:outline-none"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-mono text-[#94a3b8] uppercase">Domain Track</label>
-            <input
-              type="text"
-              value={certForm.track}
-              onChange={(e) => onChangeForm((prev) => ({ ...prev, track: e.target.value }))}
-              className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-mono text-[#94a3b8] uppercase">Validity Period</label>
-            <input
-              type="text"
-              value={certForm.validity}
-              onChange={(e) => onChangeForm((prev) => ({ ...prev, validity: e.target.value }))}
-              className="w-full px-3.5 py-2 rounded-lg bg-[#0b1326] border border-[#2d3449] text-sm font-mono text-[#dae2fd] focus:border-[#5eead4] focus:outline-none"
             />
           </div>
 

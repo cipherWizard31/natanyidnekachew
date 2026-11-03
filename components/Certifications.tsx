@@ -62,7 +62,6 @@ export default function Certifications({ certifications }: CertificationsProps) 
                   </p>
 
                   <div className="mt-2 flex items-center gap-3 text-xs font-mono text-slate-500">
-                    {cred.code && <span>ID: {cred.code}</span>}
                     {cred.status && (
                       <span className="text-teal-300/80">● {cred.status}</span>
                     )}
@@ -124,16 +123,8 @@ export default function Certifications({ certifications }: CertificationsProps) 
 
             <div className="mt-5 pt-4 border-t border-slate-800 grid grid-cols-2 gap-3 text-xs font-mono">
               <div>
-                <span className="text-slate-500 block">Credential ID:</span>
-                <span className="text-slate-300 font-semibold">{selectedCert.code || "Verified"}</span>
-              </div>
-              <div>
                 <span className="text-slate-500 block">Issued:</span>
                 <span className="text-slate-300">{selectedCert.date || selectedCert.year}</span>
-              </div>
-              <div>
-                <span className="text-slate-500 block">Validity:</span>
-                <span className="text-slate-300">{selectedCert.validity || "Lifetime"}</span>
               </div>
               <div>
                 <span className="text-slate-500 block">Status:</span>

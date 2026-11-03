@@ -69,11 +69,8 @@ export interface CertificationData {
   title: string;
   issuer: string;
   icon: string;
-  code: string;
   year: string;
   date: string;
-  validity: string;
-  track: string;
   category: string;
   status: string;
   verify_url: string;

@@ -31,16 +31,12 @@ export default function AboutModule({
             <span className="material-symbols-outlined text-[#5eead4] text-[18px]">visibility</span>
             <span>Real-Time Preview</span>
           </h2>
-          <span className="text-xs font-mono text-[#94a3b8]">Live Reflection</span>
         </div>
 
         <div className="p-6 rounded-2xl bg-[#171f33]/60 border border-[#2d3449]/60 shadow-lg space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#2d3449]/40">
             <span className="font-mono text-xs uppercase tracking-wider text-[#5eead4] font-medium">
-              Portfolio · About Me
-            </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#5eead4]/10 text-[#5eead4] border border-[#5eead4]/20">
-              SQLITE SYNC
+              About Me
             </span>
           </div>
 
@@ -50,12 +46,12 @@ export default function AboutModule({
             <p className="line-clamp-3">{aboutData.paragraph3}</p>
           </div>
 
-          {/* Client Stats Widget Preview */}
+          {/*  Stats Widget Preview */}
           <div className="mt-4 p-3.5 rounded-xl bg-[#131b2e] border border-[#2d3449] shadow-sm">
             <div className="flex items-center justify-between pb-2 border-b border-[#222a3d]">
               <span className="font-mono text-[10px] text-[#94a3b8] uppercase tracking-wider flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#5eead4] animate-pulse" />
-                Client Stats &amp; Impact
+                Stats &amp; Impact
               </span>
               <span className="font-mono text-[10px] text-[#5eead4] font-medium">
                 {aboutData.stat_experience || "6+ Yrs"} {aboutData.stat_experience_label || "Experience"}
@@ -63,8 +59,8 @@ export default function AboutModule({
             </div>
             <div className="grid grid-cols-3 gap-2 mt-2 pt-1 text-left">
               {[
-                { label: aboutData.stat_apps_label || "Apps Built",  value: aboutData.stat_projects || "12+", color: "text-[#e2e8f0]" },
-                { label: aboutData.stat_tech_label || "Tech",        value: aboutData.stat_users || "50K+",   color: "text-[#e2e8f0]" },
+                { label: aboutData.stat_apps_label || "Apps Built", value: aboutData.stat_projects || "12+", color: "text-[#e2e8f0]" },
+                { label: aboutData.stat_tech_label || "Tech", value: aboutData.stat_users || "50K+", color: "text-[#e2e8f0]" },
                 { label: aboutData.stat_users_label || "Total Users", value: aboutData.stat_uptime || "99.99%", color: "text-[#5eead4]" },
               ].map(({ label, value, color }) => (
                 <div key={label}>
@@ -81,7 +77,7 @@ export default function AboutModule({
       <div className="lg:col-span-7 p-6 md:p-8 rounded-2xl bg-[#131b2e] border border-[#2d3449]/60 shadow-xl space-y-6">
         <div className="flex items-center justify-between border-b border-[#2d3449]/50 pb-4">
           <div>
-            <span className="text-xs font-mono text-[#94a3b8]">SECTION CONTENT</span>
+            <span className="text-xs font-mono text-[#94a3b8]">CONTENT</span>
             <h3 className="text-lg font-semibold text-[#dae2fd]">
               Edit About Narrative &amp; Client Stats
             </h3>
@@ -99,7 +95,7 @@ export default function AboutModule({
               disabled={isSaving}
               className="px-4 py-1.5 rounded-lg bg-[#5eead4] text-[#00675b] text-xs font-mono font-semibold hover:bg-[#b5fff0] transition-all disabled:opacity-50"
             >
-              {isSaving ? "Saving..." : "Save Section"}
+              {isSaving ? "Saving..." : "Save"}
             </button>
           </div>
         </div>
@@ -107,9 +103,9 @@ export default function AboutModule({
         {/* Narrative paragraphs */}
         {(
           [
-            { name: "paragraph1" as const, label: "Paragraph 1: Background & Origins",               rows: 3 },
-            { name: "paragraph2" as const, label: "Paragraph 2: Engineering Philosophy & Tooling",   rows: 4 },
-            { name: "paragraph3" as const, label: "Paragraph 3: Current Research & Interests",       rows: 3 },
+            { name: "paragraph1" as const, label: "Paragraph 1: Background & Origins", rows: 3 },
+            { name: "paragraph2" as const, label: "Paragraph 2: Engineering Philosophy & Tooling", rows: 4 },
+            { name: "paragraph3" as const, label: "Paragraph 3: Current Research & Interests", rows: 3 },
           ] as const
         ).map(({ name, label, rows }) => (
           <div key={name} className="space-y-1.5">
@@ -126,15 +122,12 @@ export default function AboutModule({
           </div>
         ))}
 
-        {/* Client Stats & Impact Metric Controls */}
+        {/*  Stats & Impact Metric Controls */}
         <div className="pt-2 border-t border-[#2d3449]/40 space-y-4">
           <div>
             <span className="font-mono text-xs uppercase tracking-wider text-[#5eead4] font-medium block">
-              About Section Stats &amp; Impact Controls
+              Stats &amp; Impact Controls
             </span>
-            <p className="text-xs text-[#94a3b8] mt-1">
-              Customize both the labels and values shown in the stats bar on your portfolio About section.
-            </p>
           </div>
 
           <div className="space-y-4">
@@ -194,9 +187,8 @@ export default function AboutModule({
                     placeholder={valDefault}
                     value={aboutData[valName] ?? ""}
                     onChange={(e) => onChange({ ...aboutData, [valName]: e.target.value })}
-                    className={`w-full px-3 py-2 rounded-lg bg-[#131b2e] border border-[#2d3449] text-sm font-mono focus:border-[#5eead4] focus:outline-none ${
-                      accent ? "text-[#5eead4]" : "text-[#dae2fd]"
-                    }`}
+                    className={`w-full px-3 py-2 rounded-lg bg-[#131b2e] border border-[#2d3449] text-sm font-mono focus:border-[#5eead4] focus:outline-none ${accent ? "text-[#5eead4]" : "text-[#dae2fd]"
+                      }`}
                   />
                 </div>
               </div>

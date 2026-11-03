@@ -58,7 +58,7 @@ export default function ProjectsModule({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222a3d] hover:bg-[#2d3449] text-xs font-mono text-[#5eead4] transition-colors border border-[#5eead4]/30"
           >
             <span className="material-symbols-outlined text-[16px]">add</span>
-            <span>+ New Project</span>
+            <span>New Project</span>
           </button>
         </div>
 
@@ -69,11 +69,10 @@ export default function ProjectsModule({
               <div
                 key={project.id}
                 onClick={() => onSelect(project)}
-                className={`p-4 rounded-xl transition-all cursor-pointer border ${
-                  isSelected
+                className={`p-4 rounded-xl transition-all cursor-pointer border ${isSelected
                     ? "bg-[#222a3d] border-[#5eead4]/40 shadow-[0_0_20px_-6px_rgba(94,234,212,0.15)]"
                     : "bg-[#131b2e] border-[#2d3449]/40 hover:bg-[#171f33]"
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
