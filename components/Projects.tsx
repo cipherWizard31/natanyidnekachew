@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { ProjectData } from "@/lib/portfolio";
 import { Arrow } from "./Arrow";
 
@@ -118,21 +119,19 @@ export default function Projects({ projects }: ProjectsProps) {
 
         {/* View Full Project Archive Link */}
         <div className="mt-12">
-          <a
+          <Link
             className="inline-flex items-baseline font-medium leading-tight text-slate-200 hover:text-teal-300 focus-visible:text-teal-300 font-semibold group/link text-base"
-            href="https://github.com/cipherWizard31"
-            target="_blank"
-            rel="noreferrer noopener"
-            aria-label="View Full Project Archive (opens in a new tab)"
+            href="/archive"
+            aria-label="View Full Project Archive"
           >
             <span>
               View Full Project{" "}
               <span className="inline-block">
                 Archive
-                <Arrow external />
+                <Arrow />
               </span>
             </span>
-          </a>
+          </Link>
         </div>
       </div>
     </section>

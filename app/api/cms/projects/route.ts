@@ -23,7 +23,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { id, title, url, description, stars, forks, skills, image_url, image_alt, display_order } = body;
+    const { id, title, url, description, stars, forks, skills, image_url, image_alt, display_order, year = "2024", made_at = "" } = body;
 
     const db = getDb();
     const skillsJson = JSON.stringify(Array.isArray(skills) ? skills : []);
@@ -40,7 +40,9 @@ export async function POST(req: Request) {
             skills = ?,
             image_url = COALESCE(?, image_url),
             image_alt = ?,
-            display_order = ?
+            display_order = ?,
+            year = ?,
+            made_at = ?
         WHERE id = ?
       `).run(
         title,
@@ -52,13 +54,15 @@ export async function POST(req: Request) {
         image_url,
         image_alt || title,
         display_order || 0,
+        year || "2024",
+        made_at || "",
         id
       );
     } else {
       // Create new project
       db.prepare(`
-        INSERT INTO projects (title, url, description, stars, forks, skills, image_url, image_alt, display_order)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO projects (title, url, description, stars, forks, skills, image_url, image_alt, display_order, year, made_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(
         title,
         url,
@@ -68,11 +72,14 @@ export async function POST(req: Request) {
         skillsJson,
         image_url || "/uploads/4866c795c48c7e8f3ffd46fe9e20876d.webp",
         image_alt || title,
-        display_order || 0
+        display_order || 0,
+        year || "2024",
+        made_at || ""
       );
     }
 
     revalidatePath("/");
+    revalidatePath("/archive");
     revalidatePath("/FNYmvVFOtibWurX9D6fYFxjSU4rLTi3g");
 
     return NextResponse.json({ success: true, message: "Project saved successfully" });

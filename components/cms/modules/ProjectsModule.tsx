@@ -160,14 +160,24 @@ export default function ProjectsModule({
             onChange={(e) => onFormChange({ ...projectForm, description: e.target.value })} />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-mono text-[#94a3b8] uppercase">GitHub Stars Count</label>
+            <label className="text-xs font-mono text-[#94a3b8] uppercase">Year (Archive)</label>
+            <input type="text" placeholder="2024" value={projectForm.year || ""} className={`${inputCls} font-mono`}
+              onChange={(e) => onFormChange({ ...projectForm, year: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-mono text-[#94a3b8] uppercase">Made at (Archive)</label>
+            <input type="text" placeholder="e.g. Upstatement / Personal" value={projectForm.made_at || ""} className={inputCls}
+              onChange={(e) => onFormChange({ ...projectForm, made_at: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-mono text-[#94a3b8] uppercase">GitHub Stars</label>
             <input type="text" value={projectForm.stars} className={`${inputCls} font-mono`}
               onChange={(e) => onFormChange({ ...projectForm, stars: e.target.value })} />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-mono text-[#94a3b8] uppercase">Users Count</label>
+            <label className="text-xs font-mono text-[#94a3b8] uppercase">Users / Metric</label>
             <input type="text" placeholder="e.g. 50K+" value={projectForm.forks} className={`${inputCls} font-mono`}
               onChange={(e) => onFormChange({ ...projectForm, forks: e.target.value })} />
           </div>

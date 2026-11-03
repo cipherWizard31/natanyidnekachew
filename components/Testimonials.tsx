@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { TestimonialData } from "@/lib/portfolio";
 import { Arrow } from "./Arrow";
+import { InteractiveStarRating, StarRatingDisplay } from "./StarRating";
 
 interface TestimonialsProps {
   testimonials: TestimonialData[];
@@ -95,22 +96,8 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                     aria-label={t.relationship || "Colleague"}
                   >
                     <span>{t.relationship || "Endorsement"}</span>
-                    <div className="flex items-center gap-0.5 mt-1 text-teal-300">
-                      {Array.from({ length: t.rating ?? 5 }).map((_, i) => (
-                        <svg
-                          key={i}
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          className="w-3.5 h-3.5"
-                          aria-hidden="true"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      ))}
+                    <div className="mt-1">
+                      <StarRatingDisplay rating={t.rating ?? 5} className="w-3.5 h-3.5" />
                     </div>
                   </header>
 
@@ -294,25 +281,14 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
 
               <div>
                 <label className="block text-xs font-mono text-slate-400 uppercase tracking-wide mb-1.5">
-                  Rating
+                  Rating *
                 </label>
-                <div className="flex items-center gap-3">
-                  {[5, 4, 3, 2, 1].map((num) => (
-                    <label
-                      key={num}
-                      className="flex items-center gap-1 cursor-pointer text-xs font-mono"
-                    >
-                      <input
-                        type="radio"
-                        name="rating"
-                        value={num}
-                        checked={formData.rating === num}
-                        onChange={() => setFormData({ ...formData, rating: num })}
-                        className="accent-teal-400"
-                      />
-                      <span>{num} ★</span>
-                    </label>
-                  ))}
+                <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-700/80">
+                  <InteractiveStarRating
+                    value={formData.rating}
+                    onChange={(val) => setFormData({ ...formData, rating: val })}
+                    size="md"
+                  />
                 </div>
               </div>
 

@@ -552,6 +552,8 @@ export default function CMSClient({
       image_url: "/uploads/4866c795c48c7e8f3ffd46fe9e20876d.webp",
       image_alt: "New project architecture",
       display_order: projectsList.length + 1,
+      year: new Date().getFullYear().toString(),
+      made_at: "",
     };
     setSelectedProjectId(0);
     setProjectForm(newProj);

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { TestimonialData } from "@/lib/portfolio";
+import { StarRatingDisplay } from "@/components/StarRating";
 
 interface TestimonialsModuleProps {
   testimonials: TestimonialData[];
@@ -176,8 +177,11 @@ export default function TestimonialsModule({
                       &ldquo;{t.content}&rdquo;
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs font-mono text-slate-500 pt-1">
-                      <span>Rating: {t.rating ?? 5} / 5 ★</span>
+                    <div className="flex items-center gap-4 text-xs font-mono text-slate-400 pt-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-slate-500">Rating:</span>
+                        <StarRatingDisplay rating={t.rating ?? 5} showValue className="w-3.5 h-3.5" />
+                      </div>
                       {t.created_at && <span>Submitted: {t.created_at}</span>}
                     </div>
                   </div>

@@ -48,6 +48,8 @@ export interface ProjectData {
   image_url: string;
   image_alt: string;
   display_order: number;
+  year?: string;
+  made_at?: string;
 }
 
 export interface ExperienceData {
